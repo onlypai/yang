@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .aaa {
+            background-color: #fff;
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <div @click="outerClick">
+            外面的
+            <div @click.capture="innerClick">里面的</div>
+        </div>
+        <a @click.prevent="aLinkClick" href="www.jsplusplus.com">点击</a>
+        <div :[attr]="tableId" @[event]='handleClick'>动态参数</div>
+    </div>
+    <script src="./vue.min.js"></script>
+    <script>
+        const vm = new Vue({
+            el: '#app',
+            data() {
+                return {
+
+                    event: 'click',
+                    attr: 'text',
+                    tableId: 1
+                }
+            },
+            methods: {
+                outerClick() {
+                    console.log('外面的');
+                },
+                innerClick() {
+                    console.log('里面的');
+                },
+                aLinkClick() {
+                    console.log('a链接被点击了');
+                },
+                handleClick() {
+                    console.log('动态参数');
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

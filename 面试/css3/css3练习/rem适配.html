@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        #box {
+            width: 0.5rem;
+            height: 0.5rem;
+            background-color: rgb(236, 130, 130);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box"></div>
+    <script>
+        //实现rem适配的关键点：根元素的字体大小是屏幕的宽
+        //获取屏幕的宽
+        var width = document.documentElement.clientWidth
+            //获取根元素
+        var html = document.querySelector('html')
+
+        html.style.fontSize = width + 'px'
+    </script>
+</body>
+
+</html>

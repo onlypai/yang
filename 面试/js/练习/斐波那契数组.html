@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function aaa(num) {
+            var arr = num > 0 ? [1] : [] //初始里面有第一个元素
+            if (num > 1) {
+                for (var index = 1; index < num; index++) {
+                    arr.push(arr[index - 1] + (index >= 2 ? arr[index - 2] : 0))
+                }
+            }
+            console.log(arr);
+        }
+        aaa(20)
+    </script>
+</body>
+
+</html>

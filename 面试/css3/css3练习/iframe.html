@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .wrap {
+        width: 1200px;
+        height: 600px;
+        /* overflow-x: hidden; */
+        /* overflow-y: auto; */
+        /* overflow: hidden; */
+        background-color: rgba(221, 156, 156, 0.404);
+        position: relative;
+      }
+      .btn {
+        position: absolute;
+        top: 750px;
+        left: 50px;
+      }
+      #iframe {
+        position: absolute;
+        transform: scale(0.35);
+        left: -400px;
+        top: -170px;
+      }
+      .box {
+        width: 100%;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <button class="btn">点击</button>
+      <!-- <div class="box"> -->
+      <iframe
+        id="iframe"
+        src="https://echarts.apache.org/v4/zh/option.html#xAxis.axisLabel.show"
+        width="1920px"
+        height="920px"
+        scrolling="no"
+        frameborder="0"
+      ></iframe>
+      <!-- </div> -->
+    </div>
+  </body>
+  <script>
+    const ifr = document.getElementById("iframe")
+    ifr.onload = function () {
+      let wd = this.contentWindow.document.documentElement.scrollWidth
+      let ht = this.contentWindow.document.documentElement.scrollHeight
+      let x = document.getElementsByClassName("wrap")[0].clientWidth / wd
+      this.style.width = wd + "px"
+      this.style.height = ht + "px"
+      // this.style.transform = `scale(${x})`
+      this.style.transform = `scale(0.35)`
+      this.style.transformOrigin = "0 0"
+      document.querySelector(".box")[0].style.height = ht * x + "px"
+    }
+    document.getElementsByClassName("btn").addEventListener("click", () => {
+      console.log("aaaaa")
+    })
+  </script>
+</html>

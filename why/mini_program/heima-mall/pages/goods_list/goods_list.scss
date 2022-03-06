@@ -1,0 +1,31 @@
+.goodsData {
+    navigator {
+        display: flex;
+        height: 220rpx;
+        border-bottom: 1px solid rgb(209, 207, 207);
+        .left {
+            flex: 2;
+            padding: 15rpx;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            image {
+                width: 80%;
+            }
+        }
+        .right {
+            flex: 4;
+            .name {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                font-style: 19rpx;
+                margin: 25rpx 0;
+            }
+            .price {
+                color: #eb4500;
+            }
+        }
+    }
+}

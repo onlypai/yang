@@ -1,0 +1,10 @@
+<!--pages/home-video/index.wxml-->
+<view class="video">
+  <view class="item" wx:for="{{topMV}}" wx:key="id">
+  <!-- 直接在组件上绑定事件处理函数 -->
+    <video-item-v1 item="{{item}}" 
+                   bindtap="handleVideoItemClick"
+                   data-item="{{item}}">
+    </video-item-v1>
+  </view>
+</view>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        // var date = Date.now()
+        setInterval(() => {
+            var date = new Date('2022-2-1').getTime()
+            var dateDiff = (date - Date.now()) / 1000
+                // console.log(dateDiff); //时间差：秒
+            var day = parseInt(dateDiff / (60 * 60 * 24))
+                // console.log(day); //天
+            var hour = parseInt((dateDiff - day * (60 * 60 * 24)) / 3600)
+                // console.log(hour);
+            var min = parseInt((dateDiff - day * 3600 * 24 - hour * 3600) / 60)
+                // console.log(min);
+            var sec = parseInt(dateDiff - day * 3600 * 24 - hour * 3600 - min * 60)
+                // console.log(sec);
+            console.log(`距2020年春节还有${day}天${hour}小时${min}分钟${sec}秒`);
+        }, 1000);
+
+
+
+
+
+        // console.log(date);
+        // console.log(date.getFullYear());
+        // console.log(date.getMonth() + 1);
+        // console.log(date.getDate());
+        // console.log(date.getDay());
+        // console.log(date.getHours());
+        // console.log(date.getMinutes());
+        // console.log(date.getSeconds());
+
+        function getTime() {
+            var date = new Date()
+                // console.log(date);
+            var Y = date.getFullYear() + '-',
+                M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-',
+                D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' ',
+                h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':',
+                m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':',
+                s = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
+            console.log(Y + M + D + h + m + s);
+            return Y + M + D + h + m + s
+        }
+        getTime()
+    </script>
+</body>
+
+</html>

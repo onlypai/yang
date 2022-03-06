@@ -1,0 +1,64 @@
+<!-- pages/cart/cart.wxml -->
+<!--收货地址-->
+<view class="wrap">
+    <view class="dizhi" wx:if="{{!address.userName}}">
+        <button type="primary" plain bindtap="getAddress">添加地址</button>
+    </view>
+    <view class="dizhi info" wx:else>
+        <view class="top">
+            <text class="name">{{address.userName}}</text>
+            <text class="phone">{{address.telNumber}}</text>
+        </view>
+        <view>{{address.all}}</view>
+    </view>
+</view>
+
+<!--商品列表-->
+<view class="title">购物车</view>
+<view class="goods_list">
+    <view class="goods_info" wx:for="{{cart}}" wx:key="goods_id">
+        <navigator  url="../goods_detail/goods_detail?goods_id={{item.goods_id}}" hover-class="navigator-hover" open-type="navigate">
+            <view class="left">
+                <checkbox-group data-goods_id="{{item.goods_id}}" bindchange="handleCheck">
+                    <checkbox checked="{{item.checked}}" />
+                </checkbox-group>
+            </view>
+            <view class="right">
+                <view class="pic">
+                    <image src="{{item.goods_small_logo?item.goods_small_logo:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3458332413,4121705142&fm=26&gp=0.jpg'}}" mode="widthFix" ></image>    
+                </view>
+                <view class="goods_content">
+                    <view class="goods_name">{{item.goods_name}}</view>
+                    <view class="goods_price_num">
+                        <view class="goods_price">￥{{item.goods_price}}</view>
+                        <view class="goods_num">
+                            <text class="fix" catchtap="handleNum" data-goods_id="{{item.goods_id}}" data-operation="-1">-</text>
+                            <text class="num">{{item.num}}</text>
+                            <text class="fix" catchtap="handleNum" data-goods_id="{{item.goods_id}}" data-operation="1">+</text>
+                        </view>
+                    </view>
+                </view>
+            </view>
+            </navigator>
+    </view>
+</view>
+<!-- 底部工具栏 -->
+<view class="footer_tool">
+  <!-- 全选 -->
+  <view class="all_chk_wrap">
+    <checkbox-group bindchange="handleItemAllCheck">
+      <checkbox checked="{{allChecked}}">全选</checkbox>
+    </checkbox-group>
+  </view>
+  <!-- 总价格 -->
+  <view class="total_price_wrap">
+    <view class="total_price">
+      合计: <text class="total_price_text">￥{{totalPrice}}</text>
+    </view>
+    <view>包含运费</view>
+  </view>
+  <!-- 结算 -->
+  <view class="order_pay_wrap" bindtap="handlePay" >
+    结算({{totalNum}})
+  </view>
+</view>

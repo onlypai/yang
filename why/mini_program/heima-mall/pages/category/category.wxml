@@ -1,0 +1,33 @@
+<!-- pages/category/category.wxml -->
+<view class="Wrap-w">
+    <SearchInput></SearchInput>
+    <view class="wrap">
+        <scroll-view scroll-y class="left_menu">
+            <view class="menu {{index===currentIndex?'active':''}}"
+             wx:for="{{leftCates}}" 
+             wx:key="*this"
+             bindtap = "menuTap"
+             data-index="{{index}}"
+             >{{item}}</view>
+        </scroll-view>
+        <scroll-view scroll-y scroll-top='{{scrollTop}}'
+        class="right_content">
+            <view class="content" wx:for="{{rightContent}}" wx:key="cat_id">
+                <view class="content_title" >
+                    <text class="mitil">/</text>
+                    <text class="text">{{item.cat_name}}</text>
+                    <text class="mitil">/</text>
+                </view>
+                <view class="content_main">
+                    <view class="content_main_list" >
+                        <navigator wx:for="{{item.children}}" wx:key="cat_id" wx:for-item="item2" wx:for-index="index2"
+                        url="../goods_list/goods_list?cid={{item2.cat_id}}">
+                            <image src="{{item2.cat_icon}}" mode="widthFix" />
+                            <view class="goods_name">{{item2.cat_name}}</view>
+                        </navigator>
+                    </view>
+                </view>
+            </view>
+        </scroll-view>
+    </view>
+</view>

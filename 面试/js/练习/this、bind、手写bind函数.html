@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        function aaa() {
+            console.log(...arguments);
+            console.log("this:", this);
+        }
+        // aaa()
+        // aaa.call({
+        //     name: 'wangyang'
+        // }, 15)
+        // aaa.apply({
+        //     name: 'wangyang'
+        // }, [13])
+
+        //方式一
+        // const binda = aaa.bind({
+        //     name: 'wangyang'
+        // }, 12, 2, 56, 4)
+        // binda()
+
+        //方式二
+        // const binda = aaa.bind({
+        //     name: 'wangyang'
+        // })(12, 2, 56, 4)
+
+
+        //手动实现方式一
+        /**
+         * 函数aaa可以调用bind方法，说明Function.prototype上面有bind方法，因为aaa.hasOwnProperty('bind')=false
+         * 
+         */
+        Function.prototype.myBind = function() {
+            const self = this
+
+            //将参数类数组变成数组
+            const args = Array.prototype.slice.call(arguments)
+
+            //分别获取第一个参数对象和后面的参数
+            const thisValue = args.shift() //头部删除返回删除的
+                // console.log(args);
+                // console.log(thisValue);
+            return function() {
+                return self.call(thisValue, args)
+            }
+        }
+        const res = aaa.myBind({
+            name: 'kobe'
+        }, 1, 2, 5)
+        res()
+    </script>
+</body>
+
+</html>

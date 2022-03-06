@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        header a img {
+            width: 100%;
+        }
+        
+        main {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px;
+        }
+        
+        main section {
+            width: 100%;
+            display: flex;
+            height: 100px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        
+        .left {
+            flex: 1;
+        }
+        
+        .right {
+            flex: 2;
+            border-left: 1px solid #fff;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        .right a {
+            box-sizing: border-box;
+            width: 50%;
+            text-align: center;
+            line-height: 50px;
+            border: 1px solid #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <a href=""><img src="./001.jpg" alt=""></a>
+        </header>
+        <main>
+            <section style="background-color: aqua;">
+                <div class="left"></div>
+                <div class="right">
+                    <a href="">杜兰特</a>
+                    <a href="">詹姆斯</a>
+                    <a href="">汪库里</a>
+                    <a href="">伦纳德</a>
+                </div>
+            </section>
+            <section style="background-color: rgb(232, 157, 241);">
+                <div class="left"></div>
+                <div class="right">
+                    <a href="">杜兰特</a>
+                    <a href="">詹姆斯</a>
+                    <a href="">汪库里</a>
+                    <a href="">伦纳德</a>
+                </div>
+            </section>
+            <section style="background-color: rgb(155, 205, 247);">
+                <div class="left"></div>
+                <div class="right">
+                    <a href="">杜兰特</a>
+                    <a href="">詹姆斯</a>
+                    <a href="">汪库里</a>
+                    <a href="">伦纳德</a>
+                </div>
+            </section>
+            <section style="background-color: rgb(248, 118, 151);">
+                <div class="left"></div>
+                <div class="right">
+                    <a href="">杜兰特</a>
+                    <a href="">詹姆斯</a>
+                    <a href="">汪库里</a>
+                    <a href="">伦纳德</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

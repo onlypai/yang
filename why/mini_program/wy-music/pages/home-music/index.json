@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText":"派大星_music",
+  "usingComponents": {
+    "van-search": "@vant/weapp/search/index",
+    "area-header": "/components/area-header/index",
+    "song-item-v1": "/components/song-item-v1/index",
+    "song-menu-area": "/components/song-menu-area/index",
+    "ranking-area-item": "/components/ranking-area-item/index",
+    "play-bar": "/components/play-bar/index"
+  }
+}

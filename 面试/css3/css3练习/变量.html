@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>var</title>
+    <style>
+         :root {
+            --color: red;
+        }
+        
+        .rem {
+            /*局部变量*/
+            --num: 15px;
+            width: var(--num);
+            height: 20px;
+            background-color: var(--color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="rem">什么的需</div>
+</body>
+
+</html>

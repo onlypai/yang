@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <!-- 开启本地服务 -->
+    <!-- <script src="./index.js" type="module"></script> -->
+    <script type="module">
+      import { formatTime } from "./index.js"
+      console.log(formatTime(1643268783))
+      console.log(formatTime(1643268783056,"{Y}/{M}/{D} {h}:{m}:{s} {a}",true))
+      console.log(formatTime("1643268783056","{Y}/{M}/{D} {h}:{m}:{s} {a}",true))
+      console.log(formatTime("2018-01-22T09:12:43.083Z"))
+      console.log(formatTime("2021-09-03T22:42:05.659+00:00","{Y}/{M}/{D} {h}:{m}:{s} {a}",true))
+    </script>
+  </body>
+</html>

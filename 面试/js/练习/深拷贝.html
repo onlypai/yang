@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        {
+            function deepClone(obj) {
+                //递归终止
+                if (typeof obj !== 'object' || obj === null) return
+                    //数组对象的判断
+                const cloneObj = Array.isArray(obj) ? [] : {}
+                    //遍历
+                for (let key in obj) {
+                    //判断key是不是自己拥有的属性，保证不是原型上面的属性
+                    if (obj.hasOwnProperty(key)) {
+                        if (obj[key] && typeof obj[key] === 'object') {
+                            //递归
+                            cloneObj[key] = deepClone(obj[key])
+                        } else {
+                            cloneObj[key] = obj[key]
+                        }
+                    }
+                }
+                return cloneObj
+            }
+            const obj = {
+                    age: 20,
+                    name: '王明洁',
+                    address: {
+                        city: '杭州'
+                    },
+                    arr: ['a', 'b', 'c']
+                }
+                // let obj2 = deepClone(obj)
+                // let obj2 = JSON.parse(JSON.stringify(obj))
+                // console.log(obj);
+                // console.log(obj2);
+            console.log(obj.arr instanceof Array);
+            console.log(Array.isArray(obj.arr));
+            console.log(Object.prototype.toString.call(obj.arr));
+        }
+
+        const textObj = {
+            a: 1,
+            b: [1, 23, 3],
+            c: {
+                aa: 1
+            }
+        }
+        textObj.c.bb = textObj.c
+
+        function deepC(obj) {
+            return new Promise(resolve => {
+                const {
+                    port1,
+                    port2
+                } = new MessageChannel()
+                port2.onmessage = e => {
+                    resolve(e.data)
+                }
+                port1.postMessage(obj)
+            })
+        }
+        //此方法是异步的
+        async function text(obj) {
+            const deepObj = await deepC(obj)
+            console.log(deepObj)
+        }
+        text(textObj)
+    </script>
+</body>
+
+</html>

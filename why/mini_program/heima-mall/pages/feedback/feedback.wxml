@@ -1,0 +1,15 @@
+<view class="content">
+    <textarea value="{{textValue}}" bindinput="textInput" id="" cols="40" rows="10"></textarea>
+    <view class="up_img">
+        <view class="btn" bindtap="upImage">+</view>
+        <view class="img" wx:for="{{imageData}}" wx:key="*this" bindtap="removeImg" data-index="{{index}}">
+            <UpImg src="{{item}}"></UpImg>
+        </view>
+    </view>
+</view>
+<view class="submit">
+    <button size="mini"  type="warn" bindtap = "submit">
+        <icon type="success_no_circle" size="20" color="white"></icon>
+        提交
+    </button>
+</view>

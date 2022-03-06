@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        var arr = [1, 5, 4, 6, 8, 5, 4, 5, 1, 2, 4, 5, 11, 1]
+            // for (let i = 0; i < arr.length; i++) {
+            //     for (let j = i + 1; j < arr.length; j++) {
+            //         if (arr[i] === arr[j]) {
+            //             arr.splice(j, 1)
+            //             j--
+            //         }
+            //     }
+            // }
+            // console.log(...(new Set(arr)));
+        let arr1 = [...new Set(arr)]
+        console.log(arr1);
+
+
+
+
+
+        var arr2 = [3, 2, 3, 1, 4, true, false, "3", "22", "2", 2]
+
+        function noRepeat(arr) {
+            let resArr = []
+            let obj = {}
+            for (let i = 0; i < arr.length; i++) {
+                if (!(obj[arr[i] + typeof arr[i]])) {
+                    resArr.push(arr[i])
+                    obj[arr[i] + typeof arr[i]] = 1
+                }
+            }
+            return resArr
+        }
+        console.log(noRepeat(arr2));
+
+
+
+        Array.prototype.quchong = function() {
+            const hash = []
+            for (let i = 0; i < this.length; i++) {
+                //新数组中没有这个元素，就添加进去
+                if (hash.indexOf(this[i]) == -1) {
+                    hash.push(this[i])
+                }
+            }
+            return hash
+        }
+        console.log(arr2.quchong());
+    </script>
+</body>
+
+</html>

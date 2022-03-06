@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #box {
+            height: 100px;
+            width: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="box"></div>
+    <script>
+        // img.src = 'https://cdn2.jianshu.io/assets/default_avatar/10-e691107df16746d4a9f3fe9496fd1848.jpg'
+        // img.width = 100
+        // img.height = 100
+        // box.appendChild(img)
+
+
+        function loadImg(src) {
+            const promise = new Promise((resolve, reject) => {
+                const img = document.createElement('img')
+                img.onload = function() {
+                    resolve(img)
+                }
+                img.onerror = function() {
+                    reject('图片加载失败')
+                }
+                img.src = src
+            })
+            return promise
+        }
+        loadImg('https://cdn2.jianshu.io/assets/default_avatar/10-e691107df16746d4a9f3fe9496fd1848.jpg').then(res => {
+            box.appendChild(res)
+        }).catch(e => {
+            console.log(e);
+        })
+    </script>
+</body>
+
+</html>

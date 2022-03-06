@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const arr = [1, 3, 521, 2, 4, 7, 42, 32, 9]
+
+        function mySort(arr) {
+            for (let i = 0; i < arr.length; i++) {
+                for (let j = i + 1; j < arr.length; j++) {
+                    var cur = arr[i];
+                    var index = arr[j];
+                    //前面大于后面就交换位置
+                    if (cur > index) {
+                        // 交换值
+                        arr[j] = cur;
+                        arr[i] = index;
+                    }
+                }
+            }
+            return arr
+        }
+        console.log(mySort(arr));
+    </script>
+</body>
+
+</html>

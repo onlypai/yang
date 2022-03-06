@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        const arr1 = ['a', 2, 15, 666, 78787]
+
+        function arrReserve(arr) {
+            let resArr = []
+            for (i = arr.length - 1; i >= 0; i--) {
+                resArr[resArr.length] = arr[i]
+            }
+            return resArr
+        }
+        console.log(arrReserve(arr1))
+
+        //第二种：从中间为分隔符，将左右两边的交换
+        const arr2 = [5, 55, 555, 5555, 55555]
+
+        function rev(arr) {
+            let resArr = JSON.parse(JSON.stringify(arr))
+            for (let i = 0; i < resArr.length / 2; i++) {
+                //保存左边的部分
+                let temp = resArr[i]
+                    //将左边的值改为右边的
+                resArr[i] = resArr[resArr.length - 1 - i]
+                    //将右边的改成左边的
+                resArr[resArr.length - 1 - i] = temp
+
+            }
+            return resArr
+        }
+        console.log(rev(arr2));
+        console.log(arr2);
+    </script>
+</body>
+
+</html>

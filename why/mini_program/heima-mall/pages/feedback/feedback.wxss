@@ -1,0 +1,55 @@
+page {
+  background-color: #eee;
+}
+
+.content {
+  padding: 28rpx;
+}
+
+.content textarea {
+  width: 100%;
+  padding: 20rpx;
+  box-sizing: border-box;
+  background-color: #fff;
+}
+
+.content .up_img {
+  display: flex;
+  widows: 100%;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  background-color: #fff;
+  padding-left: 60rpx;
+}
+
+.content .up_img .btn {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 10rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #f52d2d;
+  background-color: #eee;
+  margin: 0 20rpx 20rpx 0;
+}
+
+.content .up_img .img {
+  margin: 0 20rpx 20rpx 0;
+}
+
+.submit {
+  padding: 0 28rpx;
+  height: 90rpx;
+  width: 100%;
+}
+
+.submit button {
+  float: right;
+  padding: 20rpx 0 0 0;
+  color: #fff;
+  font-size: 28rpx;
+  text-align: center;
+  font-weight: 400;
+  width: 30%;
+}

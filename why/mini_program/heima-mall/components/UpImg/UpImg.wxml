@@ -1,0 +1,4 @@
+<view class="img">
+    <icon type="clear" size="23" color="red"></icon>
+    <image src="{{src}}"></image>
+</view>

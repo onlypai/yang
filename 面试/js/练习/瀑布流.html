@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            background-color: rgba(146, 141, 141, 0.212);
+        }
+        
+        #wrap {
+            width: 1500px;
+            height: 2000px;
+            position: relative;
+            margin: 0 auto;
+        }
+        
+        .box {
+            float: left;
+            padding: 15px;
+            overflow: hidden;
+            border-radius: 7px;
+        }
+        
+        img {
+            width: 270px;
+            border-radius: 7px;
+            transition: .6s;
+        }
+        
+        img:hover {
+            transform: scale(1.2);
+        }
+    </style>
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="wrap">
+        <div class="box"><img src="C:\Users\11840\Pictures\二猪\001.jpg" alt=""></div>
+        <div class="box"><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2146690520,1274244531&fm=11&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1879773047,3198121327&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=560088173,2570605321&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3252262273,1825571150&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=3879019286,2934510714&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3081751522,2202579635&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3212147655,2958230622&fm=11&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=2289823309,119667684&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3801760462,1988494793&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=3731457094,1514449255&fm=224&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1874911162,1631376804&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1053557682,1400801228&fm=26&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=333656405,3660460047&fm=11&gp=0.jpg" alt=""></div>
+        <div class="box"><img src="https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2211172307,3318809439&fm=224&gp=0.jpg" alt=""></div>
+    </div>
+    <script>
+        window.onload = function() {
+
+            /**
+             * 瀑布流思路
+             * 1、获取列数
+             * 2、创建数组，存放高度值
+             * 3、遍历所有图片，定位图片位置
+             */
+            let div = document.getElementsByClassName('box')
+            let wrapW = wrap.offsetWidth
+
+            function buju() {
+                //1、获取列数(外包裹宽度/每个div宽度)
+                let divWidth = div[0].offsetWidth
+                let cols = parseInt(wrapW / divWidth)
+
+                const heightArr = []
+                for (let i = 0; i < div.length; i++) {
+                    if (i < cols) { //第一行
+                        let divHight = div[i].offsetHeight //div高度
+                        heightArr.push(divHight)
+                    } else {
+                        // 从第二行开始，第二行第一张插入到第一行最短的那张图片下面
+                        //获取最短的图片高度
+                        let numHig = Math.min(...heightArr)
+                            //获取最短图片索引
+                        let numIndex = heightArr.findIndex(item => item === numHig)
+
+                        div[i].style.position = 'absolute'
+                        div[i].style.top = numHig + 'px'
+                        div[i].style.left = numIndex * divWidth + 'px'
+                        heightArr[numIndex] += div[i].offsetHeight
+                    }
+                }
+            }
+            buju()
+            window.onresize = () => {
+                console.log('da');
+                wrapW = window.innerWidth
+                console.log(wrapW);
+                // buju()
+            }
+
+
+
+            //返回数组中最小的值
+            const arr1 = [13, 51, 6, 2, 34, 58]
+
+            //1、排序法
+            // arr1.sort(function(a, b) {
+            //     return a - b
+            // })
+            // console.log(arr1[0]);
+
+            //2、假设最小就是第一个
+            // let min = arr1[0]
+            // for (const key of arr1) {
+            //     min < key ? min : min = key
+            // }
+            // console.log(min);
+
+            //3、Math.min
+            // let min = Math.min.apply(null, arr1)
+            // console.log(min);
+
+            //4、扩展运算符+Math.min
+            // console.log(Math.min(...arr1));
+
+
+            //找到最小值的索引
+            //1、findIndex
+            // const minNum = Math.min(...arr1)
+            // const i = arr1.findIndex(item => item === minNum)
+            // console.log(i);
+
+            //2、判断
+            // let num = 9999999
+            // let index
+            // for (const i in arr1) {
+            //     if (arr1[i] < num) {
+            //         num = arr1[i]
+            //         index = i
+            //     }
+            // }
+            // console.log(index);
+
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        let str = 'wangyanghanhan'
+        let obj = {}
+        let maxChar = '' //记录出现最多的那个字符
+        let max = 0 //记录最多的那个字符出现的次数
+        for (let i = 0; i < str.length; i++) {
+            let char = str.charAt(i)
+            if (obj[char]) {
+                obj[char]++
+            } else {
+                obj[char] = 1 //比如说第一个字符w，obj[w]没有，所以执行这里，让他等于1，接下来如果再有w，就+1，对象里面记录的值是字符出现的次数
+            }
+            if (max < obj[char]) {
+                max = obj[char]
+                maxChar = char
+            }
+        }
+        //判断其他字符出现次数是不是最多
+        for (const i in obj) {
+            if (obj[i] == max) {
+                console.log('出现最多的字符是:', i);
+                console.log('最多的次数是:', max);
+            }
+        }
+        console.log(obj);
+    </script>
+</body>
+
+</html>

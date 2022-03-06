@@ -1,0 +1,22 @@
+<!--pages/goods_list/goods_list.wxml-->
+<SearchInput></SearchInput>
+<Tabs titleData="{{titleData}}" bindhandleTap="handleTap">
+<view wx:for="{{titleData}}" wx:key="id">
+    <block wx:if="{{item.isActive}}">
+        <view class="goodsData" wx:for="{{goodsData}}"
+        wx:key="goods_name">
+            <navigator
+            url="../goods_detail/goods_detail?goods_id={{item.goods_id}}" 
+            open-type="navigate">
+            <view class="left">
+                <image class="" src="{{item.goods_small_logo?item.goods_small_logo:'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=3458332413,4121705142&fm=26&gp=0.jpg'}}" mode="widthFix"/>
+            </view>    
+            <view class="right">
+                <view class="name">{{item.goods_name}}</view>
+                <view class="price">￥{{item.goods_price}}</view>
+            </view>
+            </navigator>
+        </view>
+    </block>
+</view>
+</Tabs>

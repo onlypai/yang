@@ -1,0 +1,15 @@
+<!--pages/detail-video/index.wxml-->
+<!-- danmu-btn弹幕按钮 	danmu-list弹幕列表  show-mute-btn是否静音 	title标题，全屏时在顶部展示
+	enable-play-gesture 播放手势双击切换播放/暂停
+    auto-pause-if-navigate 跳转到本小程序的其他页面时，是否自动暂停本页面的视频播放 默认true
+    vslide-gesture 在非全屏模式下，是否开启亮度与音量调节手势 false
+    vslide-gesture-in-fullscreen 在全屏模式下，是否开启亮度与音量调节手势
+    ...
+ -->
+<video src="{{mvURLInfo.url}}"
+       class="video"
+       autoplay
+       loop
+       danmu-btn
+       referrer-policy="origin">
+</video>

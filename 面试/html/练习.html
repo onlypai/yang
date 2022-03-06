@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #demo {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            position: relative;
+            border: 2px solid #333;
+        }
+        
+        #demo:before,
+        #demo:after {
+            border: solid transparent;
+            content: '';
+            height: 0;
+            left: 100%;
+            position: absolute;
+            width: 0;
+        }
+        
+        #demo:after {
+            border-width: 10px;
+            border-left-color: red;
+            /* border-left-color: #fff; */
+            top: 20px;
+        }
+        
+        #demo:before {
+            border-width: 12px;
+            /* border-left-color: #000; */
+            border-left-color: lightcoral;
+            top: 18px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="demo"></div>
+    <!-- 超链接 -->
+    <a href="http://www.baidu.com" target="_parent">_parent</a>
+    <a href="http://www.baidu.com" target="_top">_top</a>
+    <script>
+        var obj = {}
+        var arr = []
+        if (obj && arr) {
+            console.log('ll');
+        }
+    </script>
+</body>
+
+</html>
