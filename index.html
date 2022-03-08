@@ -32,7 +32,8 @@
       body {
         width: 100%;
         height: 100%;
-        overflow: hidden;
+        overflow-y: hidden;
+        overflow-x: hidden;
       }
       #default {
         width: 100%;
@@ -55,15 +56,26 @@
     <!-- <script src="//unpkg.com/docsify-edit-on-github/index.js"></script> -->
     <script>
       window.onload = function () {
-        const token = window.localStorage.getItem("token")
+        let url = "http://coderwy.com/#/"
+        let token = window.localStorage.getItem("token")
         function element(el) {
           return document.querySelector(el)
         }
+        //主题按钮
+        const btn = element(".button")
+        function themeBtnShow() {
+          if (window.location.href == url) {
+            btn.style.display = "none"
+          } else {
+            btn.style.display = "flex"
+          }
+        }
+        themeBtnShow()
+        window.onhashchange = themeBtnShow
 
         element("#enter_btn").addEventListener("click", function () {
-          console.log(element("#pwd_input").value)
           if (element("#pwd_input").value === "123456") {
-            element("body").style.overflow = "auto"
+            element("body").style.overflowY = "auto"
             element("#default").style.display = "none"
             token = element("#pwd_input").value
             window.localStorage.setItem("token", element("#pwd_input").value)
@@ -71,34 +83,25 @@
         })
 
         if (token === "123456") {
-          element("body").style.overflow = "auto"
+          element("body").style.overflowY = "auto"
           element("#default").style.display = "none"
         } else {
-          element("body").style.overflow = "hidden"
+          element("body").style.overflowY = "hidden"
           element("#default").style.display = "flex"
         }
-      }
 
-      //主题按钮
-      const btn = element(".button")
-      let themeStatus = true
-      btn.addEventListener("click", () => {
-        // window.location.href = 'http://localhost:3000/#/'
-        themeStatus = !themeStatus
-        if (themeStatus) {
-          element('link[rel="stylesheet"]').href = "./themeStyle/vue.css" // vue主题：//unpkg.com/docsify/lib/themes/vue.css
-        } else {
-          element('link[rel="stylesheet"]').href =
-            "./themeStyle/theme-simple-dark.css" //黑色主题：https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css
-        }
-      })
-      window.onhashchange = function () {
-        console.log(window.location.href)
-        if (window.location.href == "http://coderwy.com/#/") {
-          btn.style.display = "none"
-        } else {
-          btn.style.display = "flex"
-        }
+        let themeStatus = true
+        btn.addEventListener("click", () => {
+          // window.location.href = 'http://localhost:3000/#/'
+          themeStatus = !themeStatus
+          if (themeStatus) {
+            document.querySelector('link[rel="stylesheet"]').href =
+              "./themeStyle/vue.css" // vue主题：//unpkg.com/docsify/lib/themes/vue.css
+          } else {
+            document.querySelector('link[rel="stylesheet"]').href =
+              "./themeStyle/theme-simple-dark.css" //黑色主题：https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css
+          }
+        })
       }
     </script>
     <script>
