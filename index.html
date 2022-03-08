@@ -1,83 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>PatrickStar</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-    <meta name="description" content="Description">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="icon" href="./paintstar.ico" type="image/x-ico">
+    <meta name="description" content="Description" />
+    <meta
+      name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    />
+    <link rel="icon" href="./paintstar.ico" type="image/x-ico" />
     <!-- <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css"> -->
-    <link rel="stylesheet" href="./themeStyle/vue.css">
+    <link rel="stylesheet" href="./themeStyle/vue.css" />
     <style>
-        .button {
-            width: 60px;
-            height: 60px;
-            border-radius: 10px;
-            overflow: hidden;
-            position: fixed;
-            right: 20px;
-            bottom: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            cursor: pointer;
-            background-size: 100% 100%;
-            background-image: url(./paintstar.ico);
-        }
+      .button {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        overflow: hidden;
+        position: fixed;
+        right: 20px;
+        bottom: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        cursor: pointer;
+        background-size: 100% 100%;
+        background-image: url(./paintstar.ico);
+      }
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      #default {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
+    <div id="default">
+      <input id="pwd_input" value="" placeholder="菠萝菠萝蜜" />
+      <button id="enter_btn">进入</button>
+    </div>
     <div id="app"></div>
     <div class="button"></div>
     <!-- docsify-edit-on-github -->
     <!-- <script src="//unpkg.com/docsify-edit-on-github/index.js"></script> -->
     <script>
-        window.$docsify = {
-            name: '阿星的文档',
-            // repo: 'https://gitee.com/leopai/yang',
-            maxLevel: 5, //最大支持渲染的标题层级
-            subMaxLevel: 3,
-            homepage: 'README.md',
-            coverpage: true,
-            loadSidebar: true,
-            auto2top: true, //切换页面后是否自动跳转到页面顶部
-            //全文搜索
-            search: {
-                //maxAge: 86400000, // 过期时间，单位毫秒，默认一天
-                paths: 'auto',
-                placeholder: '搜索',
-                noData: '找不到结果',
-                // 搜索标题的最大程级, 1 - 6
-                depth: 3,
-            },
-            // plugins: [
-            //     EditOnGithubPlugin.create('https://gitee.com/leopai/yang/main/')
-            // ],
+      window.onload = function () {
+        const token = window.localStorage.getItem("token")
+        function element(el) {
+          return document.querySelector(el)
         }
 
-        const btn = document.querySelector('.button')
-        let themeStatus = true
-        btn.addEventListener('click', () => {
-            // window.location.href = 'http://localhost:3000/#/'
-            themeStatus = !themeStatus
-            if (themeStatus) {
-                document.querySelector('link[rel="stylesheet"]').href = './themeStyle/vue.css' // vue主题：//unpkg.com/docsify/lib/themes/vue.css
-            } else {
-                document.querySelector('link[rel="stylesheet"]').href = './themeStyle/theme-simple-dark.css' //黑色主题：https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css
-            }
+        element("#enter_btn").addEventListener("click", function () {
+          console.log(element("#pwd_input").value)
+          if (element("#pwd_input").value === "123456") {
+            element("body").style.overflow = "auto"
+            element("#default").style.display = "none"
+            token = element("#pwd_input").value
+            window.localStorage.setItem("token", element("#pwd_input").value)
+          }
         })
-        window.onhashchange = function() {
-            console.log(window.location.href);
-            if (window.location.href == 'https://onlypai.github.io/yang/#/') {
-                btn.style.display = 'none'
-            } else {
-                btn.style.display = 'flex'
-            }
+
+        if (token === "123456") {
+          element("body").style.overflow = "auto"
+          element("#default").style.display = "none"
+        } else {
+          element("body").style.overflow = "hidden"
+          element("#default").style.display = "flex"
         }
+      }
+
+      //主题按钮
+      const btn = element(".button")
+      let themeStatus = true
+      btn.addEventListener("click", () => {
+        // window.location.href = 'http://localhost:3000/#/'
+        themeStatus = !themeStatus
+        if (themeStatus) {
+          element('link[rel="stylesheet"]').href = "./themeStyle/vue.css" // vue主题：//unpkg.com/docsify/lib/themes/vue.css
+        } else {
+          element('link[rel="stylesheet"]').href =
+            "./themeStyle/theme-simple-dark.css" //黑色主题：https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css
+        }
+      })
+      window.onhashchange = function () {
+        console.log(window.location.href)
+        if (window.location.href == "http://coderwy.com/#/") {
+          btn.style.display = "none"
+        } else {
+          btn.style.display = "flex"
+        }
+      }
+    </script>
+    <script>
+      window.$docsify = {
+        name: "阿星的文档",
+        // repo: 'https://gitee.com/leopai/yang',
+        maxLevel: 5, //最大支持渲染的标题层级
+        subMaxLevel: 3,
+        homepage: "README.md",
+        coverpage: true,
+        loadSidebar: true,
+        auto2top: true, //切换页面后是否自动跳转到页面顶部
+        //全文搜索
+        search: {
+          //maxAge: 86400000, // 过期时间，单位毫秒，默认一天
+          paths: "auto",
+          placeholder: "搜索",
+          noData: "找不到结果",
+          // 搜索标题的最大程级, 1 - 6
+          depth: 3,
+        },
+        // plugins: [
+        //     EditOnGithubPlugin.create('https://gitee.com/leopai/yang/main/')
+        // ],
+      }
     </script>
     <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
     <!--Java代码高亮-->
@@ -92,6 +138,5 @@
     <script src="//unpkg.com/docsify/lib/plugins/zoom-image.js"></script>
     <!-- 字数统计 -->
     <script src="//unpkg.com/docsify-count/dist/countable.js"></script>
-</body>
-
+  </body>
 </html>
