@@ -29,81 +29,38 @@
         background-size: 100% 100%;
         background-image: url(./paintstar.ico);
       }
-      body {
-        width: 100%;
-        height: 100%;
-        overflow-y: hidden;
-        overflow-x: hidden;
-      }
-      #default {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
     </style>
   </head>
 
   <body>
-    <div id="default">
-      <input id="pwd_input" value="" placeholder="菠萝菠萝蜜" />
-      <button id="enter_btn">进入</button>
-    </div>
     <div id="app"></div>
     <div class="button"></div>
     <!-- docsify-edit-on-github -->
     <!-- <script src="//unpkg.com/docsify-edit-on-github/index.js"></script> -->
     <script>
-      window.onload = function () {
-        let url = "http://coderwy.com/#/"
-        let token = window.localStorage.getItem("token")
-        function element(el) {
-          return document.querySelector(el)
-        }
-        //主题按钮
-        const btn = element(".button")
-        function themeBtnShow() {
-          if (window.location.href == url) {
-            btn.style.display = "none"
-          } else {
-            btn.style.display = "flex"
-          }
-        }
-        themeBtnShow()
-        window.onhashchange = themeBtnShow
-
-        element("#enter_btn").addEventListener("click", function () {
-          if (element("#pwd_input").value === "123456") {
-            element("body").style.overflowY = "auto"
-            element("#default").style.display = "none"
-            token = element("#pwd_input").value
-            window.localStorage.setItem("token", element("#pwd_input").value)
-          }
-        })
-
-        if (token === "123456") {
-          element("body").style.overflowY = "auto"
-          element("#default").style.display = "none"
+      const btn = document.querySelector(".button")
+      let themeStatus = true
+      btn.addEventListener("click", () => {
+        themeStatus = !themeStatus
+        if (themeStatus) {
+          document.querySelector('link[rel="stylesheet"]').href =
+            "./themeStyle/vue.css" // vue主题：//unpkg.com/docsify/lib/themes/vue.css
         } else {
-          element("body").style.overflowY = "hidden"
-          element("#default").style.display = "flex"
-          window.location.href == url
+          document.querySelector('link[rel="stylesheet"]').href =
+            "./themeStyle/theme-simple-dark.css" //黑色主题：https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css
         }
-
-        let themeStatus = true
-        btn.addEventListener("click", () => {
-          // window.location.href = 'http://localhost:3000/#/'
-          themeStatus = !themeStatus
-          if (themeStatus) {
-            document.querySelector('link[rel="stylesheet"]').href =
-              "./themeStyle/vue.css" // vue主题：//unpkg.com/docsify/lib/themes/vue.css
-          } else {
-            document.querySelector('link[rel="stylesheet"]').href =
-              "./themeStyle/theme-simple-dark.css" //黑色主题：https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css
-          }
-        })
+      })
+      function themeBtnShow() {
+        console.log(window.location.href)
+        if (window.location.href == "http://coderwy.com/#/") {
+          btn.style.display = "none"
+        } else {
+          btn.style.display = "flex"
+        }
       }
+      themeBtnShow()
+      window.onload = themeBtnShow
+      window.onhashchange = themeBtnShow
     </script>
     <script>
       window.$docsify = {
