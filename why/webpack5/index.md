@@ -357,7 +357,7 @@ module.exports={
 
 ### CopyWebpackPlugin
 
-有的文件我们只需要复制到打包文件夹就可以了，比如说图标文件，这事就需要使用CopyWebpackPlugin
+有的文件我们只需要复制到打包文件夹就可以了，比如说图标文件，这时就需要使用CopyWebpackPlugin
 
 ```js
 const CopyWebpackPlugin =require('copy-webpack-plugin')//这个类不是插件中的属性
@@ -605,7 +605,7 @@ module.exports={
 
 ## 1、搭建本地服务
 
-之前想要运行开发的代码我们需要执行npm run build后的代码，或者是使用vscode插件live server，但是这样会影响我们的开发效率，我们希望：文件发生就可以自动编译和展示
+之前想要运行开发的代码我们需要执行npm run build后的代码，或者是使用vscode插件live server，但是这样会影响我们的开发效率，我们希望：文件发生改变就可以自动编译和展示
 
 weebpack提供了三种方式：
 
@@ -713,7 +713,7 @@ if (module.hot) {
 
 ![image-20210816231401686](webpack5.assets/image-20210816231401686.png) 
 
-**vue-loader中已经替你设置了上面的module.hot那样的if语句代码，所以在.vue文件中可以幽默快热替换效果了**
+**vue-loader中已经替你设置了上面的module.hot那样的if语句代码，所以在.vue文件中默认就有模块热替换效果了**
 
 ##### HMR原理
 
@@ -757,7 +757,7 @@ if (module.hot) {
 
 ![image-20210816231521668](webpack5.assets/image-20210816231521668.png) 
 
-proxy中‘/api’中的两外两个属性
+proxy中‘/api’中的另外两个属性
 
 secure：默认情况下不接收转发到https的服务器上，如果希望支持，可以设置为false；
 
@@ -1101,7 +1101,7 @@ moudle.exports={
 
 ![image-20210816231727319](webpack5.assets/image-20210816231727319.png) 
 
-就是你写的vue项目（spa页面），已经进行路由跳转了，这是你刷新页面其实是会返回404，但是还是可以请求到资源，是因为vue-cli依赖webpack中已经配置`historyApiFallback:true`，如果想在vue-cli项目中修改webpack配置，需要在vue.config.js文件中进行修改
+就是你写的vue项目（spa页面），已经进行路由跳转了，这时你刷新页面其实是会返回404，但是还是可以请求到资源，是因为vue-cli依赖webpack中已经配置`historyApiFallback:true`，如果想在vue-cli项目中修改webpack配置，需要在vue.config.js文件中进行修改
 
 ```js
 module.exports = {
@@ -1115,7 +1115,7 @@ module.exports = {
 
 ### require.context()实现工程自动化
 
-如果需要导入某个文件夹中的所有模块，可以使用`require.context()`，他会遍历该文件夹中文件并且自动导入，使用你不需要写很多`import` 语法来导入文件
+如果需要导入某个文件夹中的所有模块，可以使用`require.context()`，他会遍历该文件夹中文件并且自动导入，使你不需要写很多`import` 语法来导入文件
 
 该方法传递三个参数：
 
