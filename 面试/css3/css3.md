@@ -677,7 +677,7 @@ initial-scale为缩放比：为1不进行任何缩放
   function setHtmlFontSize(){
     //实现rem适配的关键点：根元素的字体大小是屏幕的宽
     //获取屏幕的宽
-    var width = document.documentElement.clientWidth || window.innerWidth
+    var width = document.documentElement.offsetWidth || window.innerWidth
     //获取根元素
     var html = document.querySelector('html') || var html = document.documentElement
     html.style.fontSize = width + 'px'
