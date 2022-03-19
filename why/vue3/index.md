@@ -24,7 +24,6 @@ template选项的值以`#`开头，会以`document.querySelector("#why")`的方�
     }).mount('#app');
   </script>
 </body>
-</html>
 ```
 
 * 直接使用`template`属性，设置`id`属性（用的多）
@@ -50,7 +49,6 @@ template选项的值以`#`开头，会以`document.querySelector("#why")`的方�
 
   </script>
 </body>
-</html>
 ```
 
 > 这里如果你直接使用`div`元素代替`template`使用，其实也是可以的，但是这个个div元素也会正常渲染出来，而template元素是`占位符`，不会真正的渲染
