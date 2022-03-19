@@ -4946,7 +4946,7 @@ root = true
 charset = utf-8 # 设置文件字符集为 utf-8
 indent_style = space # 缩进风格（tab | space）
 indent_size = 2 # 缩进大小
-end_of_line = lf # 控制换行类型(lf | cr | crlf)
+end_of_line = crlf # 控制换行类型(lf | cr | crlf)
 trim_trailing_whitespace = true # 去除行首的任意空白字符
 insert_final_newline = true # 始终在文件末尾插入一个新行
 
@@ -4954,6 +4954,22 @@ insert_final_newline = true # 始终在文件末尾插入一个新行
 max_line_length = off
 trim_trailing_whitespace = false
 ```
+
+> **CRLF、CR、LF详解**
+>
+> 很长一段时间里，对于CRLF、CR、LF的理解仅限于不同操作系统下对换行符的定义。
+>
+> * CR：Carriage Return，对应ASCII中转义字符\r，表示回车
+>
+> * LF：Linefeed，对应ASCII中转义字符\n，表示换行
+>
+> * CRLF：Carriage Return & Linefeed，\r\n，表示回车并换行
+>
+>   众所周知，`Windows操作系统采用两个字符来进行换行，即CRLF；`
+>
+>   `Unix/Linux/Mac OS X操作系统采用单个字符LF来进行换行；`
+>
+>   另外，MacIntosh操作系统（即早期的Mac操作系统）采用单个字符CR来进行换行。
 
 VSCode需要安装一个插件才可以读取这个文件：`EditorConfig for VS Code`，webstorm不需要安装
 
@@ -4971,29 +4987,46 @@ npm install prettier -D
 
 2.配置`.prettierrc`文件：
 
-* useTabs：使用tab缩进还是空格缩进，选择false；
-* tabWidth：tab是空格的情况下，是几个空格，选择2个；
-* printWidth：当行字符的长度，推荐80，超过这个字符长度就折行，也有人喜欢100或者120；
-* singleQuote：使用单引号还是双引号，选择true，使用单引号；
-* trailingComma：在多行输入的尾逗号是否添加，设置为 `none`；
-* semi：语句末尾是否要加分号，默认值true，选择false表示不加；
-
 ```json
 {
   "useTabs": false,
   "tabWidth": 2,
   "printWidth": 80,
-  "singleQuote": true,
+  "singleQuote": false,
   "trailingComma": "none",
   "semi": false
 }
+```
+
+```shell
+/*  prettier的配置 */
+"prettier.printWidth": 100, // 超过最大值换行
+"prettier.tabWidth": 4, // 缩进字节数
+"prettier.useTabs": false, // 缩进不使用tab，使用空格
+"prettier.semi": true, // 句尾添加分号
+"prettier.singleQuote": true, // 使用单引号代替双引号
+"prettier.proseWrap": "preserve", // 默认值。因为使用了一些折行敏感型的渲染器（如GitHub comment）而按照markdown文本样式进行折行
+"prettier.arrowParens": "avoid", //  (x) => {} 箭头函数参数只有一个时是否要有小括号。avoid：省略括号
+"prettier.bracketSpacing": true, // 在对象，数组括号与文字之间加空格 "{ foo: bar }"
+"prettier.disableLanguages": ["vue"], // 不格式化vue文件，vue文件的格式化单独设置
+"prettier.endOfLine": "auto", // 结尾是 \n \r \n\r auto
+"prettier.eslintIntegration": false, //不让prettier使用eslint的代码格式进行校验
+"prettier.htmlWhitespaceSensitivity": "ignore",
+"prettier.ignorePath": ".prettierignore", // 不使用prettier格式化的文件填写在项目的.prettierignore文件中
+"prettier.jsxBracketSameLine": false, // 在jsx中把'>' 是否单独放一行
+"prettier.jsxSingleQuote": false, // 在jsx中使用单引号代替双引号
+"prettier.parser": "babylon", // 格式化的解析器，默认是babylon
+"prettier.requireConfig": false, // Require a 'prettierconfig' to format prettier
+"prettier.stylelintIntegration": false, //不让prettier使用stylelint的代码格式进行校验
+"prettier.trailingComma": "es5", // 在对象或数组最后一个元素后面是否加逗号（在ES5中加尾逗号）
+"prettier.tslintIntegration": false // 不让prettier使用tslint的代码格式进行校验
 ```
 
 有的文件不需要进行代码格式化，可以创建下面的文件
 
 3.创建`.prettierignore`忽略文件
 
-```
+```properties
 /dist/*
 .local
 .output.js
@@ -5007,7 +5040,7 @@ npm install prettier -D
 
 4.VSCode需要安装prettier的插件
 
-![image-20210812223717388](index.assets/image-20210812223717388.png) 
+![image-20210812223717388](index.assets/image-20210812223717388.png) 进入插件配置设置与`.prettierrc`文件相同的格式化风格
 
 5.测试prettier是否生效
 
@@ -5025,6 +5058,24 @@ npm install prettier -D
 ```json
 "prettier": "prettier --write ."
 ```
+
+> 补充：
+>
+> ```js
+>     // 使能每一种语言默认格式化规则 `settings.json`
+>     "[html]": {
+>         "editor.defaultFormatter": "esbenp.prettier-vscode"
+>     },
+>     "[css]": {
+>         "editor.defaultFormatter": "esbenp.prettier-vscode"
+>     },
+>     "[less]": {
+>         "editor.defaultFormatter": "esbenp.prettier-vscode"
+>     },
+>     "[javascript]": {
+>         "editor.defaultFormatter": "esbenp.prettier-vscode"
+>     },
+> ```
 
 #### 3、使用ESLint检测
 
