@@ -684,6 +684,137 @@ export {
 
 ![image-20220321224623015](index.assets/image-20220321224623015.png) 
 
+### 常见内置模块path、fs、events
+
+#### path
+
+![image-20220322215058610](index.assets/image-20220322215058610.png)
+
+文件路径拼接：
+
+​	**path.resolve('路径'，'文件名')**
+
+​	**path.join('路径'，'文件名')**
+
+获取文件路径信息：
+
+​    **path.dirname('文件完整路径')**
+
+​	**path.basename('文件完整路径')**
+
+​	**path.extname('文件完整路径')**  
+
+```js
+const path = require('path')
+
+const basePath = '../fea1/node'
+const fileName = 'aaa.js'
+// 1、路径的拼接path.resolve()和path.join()    //resolve用的多
+//path.resolve()会判断路径拼接的字符串中是否有/或./或../开头的路径，获取的是该路径所在的绝对路径，更加灵活，但是path.join()会直接拼接
+const filePath1 = path.resolve(basePath, fileName)
+console.log(filePath1) //D:\node\node练习\fea1\node\aaa.js
+const filePath2 = path.join(basePath, fileName)
+console.log(filePath2) //..\fea1\node\aaa.js
+// 如果fileName为'/aaa.js'（前面也有杠），那么path.resolve拼接路径就只是C:\aaa.js
+
+
+//2、获取路径相关信息
+const filePath3 = 'node/aaa/haha.txt'
+console.log(path.dirname(filePath3)) //获取路径前面的文件夹信息 node/aaa
+console.log(path.basename(filePath3)) //获取后面的文件信息 haha.txt
+console.log(path.extname(filePath3)) //获取文件扩展名信息 .txt
+```
+
+#### fs
+
+`__dirname` 总是指向被执行 js 文件的`绝对路径`，所以当你在 `/d1/d2/myscript.js` 文件中写了 `__dirname`， 它的值就是 `/d1/d2` 。
+
+![image-20220322220325874](index.assets/image-20220322220325874.png) 
+
+文件系统的API大多提供三种操作方式
+
+![image-20220322220524943](index.assets/image-20220322220524943.png) 
+
+* 获取文件信息
+
+  ```js
+  const fs = require('fs')
+  //案例：读取文件信息
+  const filePath = './fs文件读取.txt' //文件路径
+  
+  //方式一：同步操作
+  const info = fs.statSync(filePath)
+  console.log('info',info)
+  console.log('阻塞')
+  
+  
+  //方式二：异步操作
+  fs.stat(filePath, (err, stats) => {
+    if (err) {
+      console.log(err)
+      return
+    }
+    console.log('stats',stats)
+  })
+  console.log('异步，不会被阻塞')
+  
+  
+  //方式3：peomise操作
+  fs.promises
+    .stat(filePath)
+    .then((data) => {
+      console.log(data)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  console.log('promise异步操作，不会阻塞')
+  ```
+
+  文件描述符fd⭐
+
+  ![image-20220322221800180](index.assets/image-20220322221800180.png) 
+
+  ```js
+  // 方式四：先获取文件描述符，再根据文件描述符来操作某一个文件
+  fs.open(filePath, (err, fd) => {
+    if (err) return
+    console.log(fd) //文件描述符
+    fs.fstat(fd, (err, info) => {
+      console.log(info) //文件信息
+    })
+  }) 
+  ```
+
+* 文件的读写 
+
+  ```js
+  const fs = require('fs')
+  
+  //文件写入
+  const content = '你好啊利益和'
+  fs.writeFile('./fs文件读取.txt', content, { flag: 'a' }, (err) => {
+    //第三个参数可选，flag选项
+    console.log(err) //为null就写入成功
+  })
+  // 文件读取
+  fs.readFile('./fs文件读取.txt', { encoding: 'utf-8' }, (err, data) => {
+    //可选参数encoding指定字符编码
+    console.log(data)
+    console.log('文件读取成功')
+  })
+  ```
+
+  常见flag选项
+
+  ![image-20220322222448800](index.assets/image-20220322222448800.png) 
+
+  
+
+*  
+
+* 
+
 
 
 
