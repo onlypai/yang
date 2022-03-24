@@ -797,9 +797,10 @@ console.log(path.extname(filePath3)) //获取文件扩展名信息 .txt
     //第三个参数可选，flag选项
     console.log(err) //为null就写入成功
   })
+  
   // 文件读取
   fs.readFile('./fs文件读取.txt', { encoding: 'utf-8' }, (err, data) => {
-    //可选参数encoding指定字符编码
+    //可选参数encoding指定字符编码，默认utf-8
     console.log(data)
     console.log('文件读取成功')
   })
@@ -809,11 +810,80 @@ console.log(path.extname(filePath3)) //获取文件扩展名信息 .txt
 
   ![image-20220322222448800](index.assets/image-20220322222448800.png) 
 
+  [字符编码详解](https://www.jianshu.com/p/899e749be47c)
+
+* 文件夹操作
+
+  ```js
+  const fs = require('fs')
+  const path = require('path')
   
+  
+  //1.创建文件夹
+  const dirName = './创建的文件夹'
+  //先判断这个文件夹存不存在
+  if (!fs.existsSync(dirName)) { //fs.existsSync()判断文件夹存不存在（同步）
+      fs.mkdir(dirName, err => { //fs.mkdir()创建文件夹
+          console.log('文件夹创建成功');
+      })
+  }
+  
+  //2.读取文件夹中的所有文件
+  //withFileTypes可选参数，默认为false，使读取的文件名或文件夹名为对象方式存在，以对象方式存在就可以调用isFile()和isDirectory()
+  fs.readdir(dirName, { withFileTypes: true }, (err, files) => {
+      console.log(files);
+  })
+  
+  //读取文件夹中的所有文件，如果文件夹中还有文件夹，也都读取
+  //fs.readdirSync() 同步读取
+  function getFiles(dirName) {
+      fs.readdir(dirName, { withFileTypes: true }, (err, files) => {
+          files.forEach(item => {
+              if (item.isDirectory()) { //item.isDirectory()是文件夹返回true
+                  const filePath = path.resolve(dirName, item.name)
+                  getFiles(filePath) //如果是文件夹，递归调用
+              } else {
+                  console.log(item.name)
+              }
+          })
+      })
+  }
+  getFiles(dirName)
+  
+  // 3.重命名
+  fs.rename('./创建的文件夹','./新名字',(err,info)=>{
+      if(err) return
+      console.log(info);
+      console.log(info.isDirectory());
+      console.log(info.isFile());
+  })
+  ```
 
-*  
+#### events
 
-* 
+```js
+const EventEmitter = require('events')
+//创建发射器
+const emitter = new EventEmitter()
+//监听发出的click事件
+// on是addListener的alias
+emitter.on('click', (arg1, arg2) => {
+    console.log("监听1", arg1, arg2);
+})
+const listener = arg1 => {
+    console.log("监听2", arg1);
+}
+emitter.on('click', listener)
+setTimeout(() => {
+    emitter.off('click', listener) //取消对指定事件的监听
+    //发出click事件
+    emitter.emit('click', '信息1', '信息2')
+}, 2000)
+```
+
+
+
+
 
 
 
