@@ -715,7 +715,21 @@ const filePath1 = path.resolve(basePath, fileName)
 console.log(filePath1) //D:\node\node练习\fea1\node\aaa.js
 const filePath2 = path.join(basePath, fileName)
 console.log(filePath2) //..\fea1\node\aaa.js
-// 如果fileName为'/aaa.js'（前面也有杠），那么path.resolve拼接路径就只是C:\aaa.js
+
+//1
+const basePath = '../fea1/node'
+const fileName = '/aaa.js' // /开头
+const filePath1 = path.resolve(basePath, fileName)//D:\aaa.js
+
+//2
+const basePath = '../fea1/node'
+const fileName = './aaa.js' // ./开头
+const filePath1 = path.resolve(basePath, fileName)//D:\node\node练习\fea1\node\aaa.js
+
+//3
+const basePath = '../fea1/node'
+const fileName = '../aaa.js' // ../开头,会找到上一层
+const filePath1 = path.resolve(basePath, fileName)//D:\node\node练习\fea1\aaa.js
 
 
 //2、获取路径相关信息
