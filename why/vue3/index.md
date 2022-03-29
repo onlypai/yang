@@ -4946,7 +4946,7 @@ root = true
 charset = utf-8 # 设置文件字符集为 utf-8
 indent_style = space # 缩进风格（tab | space）
 indent_size = 2 # 缩进大小
-end_of_line = crlf # 控制换行类型(lf | cr | crlf)
+end_of_line = lf # 控制换行类型(lf | cr | crlf)
 trim_trailing_whitespace = true # 去除行首的任意空白字符
 insert_final_newline = true # 始终在文件末尾插入一个新行
 
@@ -4994,9 +4994,12 @@ npm install prettier -D
   "printWidth": 80,
   "singleQuote": false,
   "trailingComma": "none",
-  "semi": false
+  "semi": false,
+  "endOfLine": "auto"
 }
 ```
+
+> 代码拉取到本地可能会有类似` error  Delete `␍`  prettier/prettier`的错误导致项目运行失败，是因为prettier对`行尾控制换行类型`检验的问题，可以设置`"endOfLine": "auto"`，取消对该项的检验
 
 ```shell
 /*  prettier的配置 */
@@ -5040,7 +5043,7 @@ npm install prettier -D
 
 4.VSCode需要安装prettier的插件
 
-![image-20210812223717388](index.assets/image-20210812223717388.png) 进入插件配置设置与`.prettierrc`文件相同的格式化风格
+![image-20210812223717388](index.assets/image-20210812223717388.png) 进入插件配置设置与`.prettierrc`文件相同的格式化风格⭐
 
 5.测试prettier是否生效
 
