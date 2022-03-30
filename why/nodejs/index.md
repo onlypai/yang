@@ -895,9 +895,117 @@ setTimeout(() => {
 }, 2000)
 ```
 
+### [Buffer](https://nodejs.org/dist/latest-v16.x/docs/api/buffer.html)
+
+#### 数据的二进制
+
+![image-20220330135841620](index.assets/image-20220330135841620.png) 
+
+#### Buffer和二进制
+
+![image-20220330140339090](index.assets/image-20220330140339090.png) 
+
+#### Buffer和字符串
+
+```js
+//英文字符串
+const message1 = 'hello'
+
+//1、由于安全性和可用性问题，不推荐使用 Buffer(),Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+// const buffer = new Buffer(message1)
+
+//2、方式二 Buffer.from()
+const buffer1 = Buffer.from(message1)
+const buffer2 = Buffer.from(message1, 'utf8') //第二个参数选项，指定字符编码，默认utf8，
+console.log('buffer1:', buffer1); //<Buffer 68 65 6c 6c 6f>   一个英文一个字节⭐
+
+//中文字符串
+const message2 = '你好'
+const buffer3 = Buffer.from(message2) //默认是utf8进行编码
+const buffer4 = Buffer.from(message2, 'utf16le')
+console.log('buffer3:', buffer3); // <Buffer e4 bd a0 e5 a5 bd> 生僻字外，一个汉字utf8编码成为三个字节⭐
+console.log('buffer4:', buffer4); // <Buffer 60 4f 7d 59>   不同编码方式字节不同
+
+//toString()默认是使用utf8进行解码
+console.log('buffer3使用utf8解码:', buffer3.toString());//你好 
+console.log('buffer4使用utf16解码:', buffer4.toString('utf16le'));//你好 
+//如果编码传递了编码方式，解码也要传递相应的方式⭐
+
+//方式三：alloc方式
+const buffer5 = Buffer.alloc(8)//size
+console.log('buffer5', buffer5); //<Buffer 00 00 00 00 00 00 00 00>
+buffer5[0] = 88 //10进制88=0x58
+buffer5[1] = 0x88 
+console.log('buffer5', buffer5); //<Buffer 58 88 00 00 00 00 00 00>
+```
+
+#### Buffer和文件操作
+
+```js
+const fs = require('fs')
+
+//不指定字符编码，默认读取到的就是二进制Buffer数据
+fs.readFile('./aaa.txt', (err, data) => {
+  if (err) return
+  console.log(data);//<Buffer e5 b0 8f e7 b3 96 e7 b3 96 e5 b0 8f e6 b4 8b e6 b4 8b>
+  console.log(data.toString());//小糖糖小洋洋
+})
+fs.readFile('./aaa.txt', { encoding: 'utf-8' }, (err, data) => {
+  if (err) return
+  console.log(data);//小糖糖小洋洋
+})
 
 
+// 读取图片
+fs.readFile('./pai.jpg', (err, data)=>{
+  if(err) return
+  console.log(data);//<Buffer 52 49 46 46 a6 19 00 00 57 45 42 50 56 50 38 ... 6524 more bytes>
+  fs.writeFile('./newPar.jpg', data, err=> console.log(err))
+})
 
+//对图片进行处理，使用sharp库 https://www.npmjs.com/package/sharp
+const sharp = require('sharp')
+fs.readFile('./pai.jpg', (err, data)=>{
+  if(err) return
+  sharp(data)
+  .resize(100, 100)
+  .toFile('./output.jpg', (err, info) => { 
+    console.log(err);
+    console.log(info);//图片信息
+   })
+})
+```
+
+### 事件循环与异步IO
+
+#### 事件循环是什么
+
+![image-20220330155033525](index.assets/image-20220330155033525.png) 
+
+#### 进程和线程
+
+进程和线程是操作系统中的两个概念：        （维基百科）
+
+* 进程（process）：`计算机已经运行的程序`
+* 线程（thread）：操作系统能够运行`运算调度`的最小单位
+
+解释：
+
+* 进程：可以认为是启动一个应用程序，就会默认开启一个进程（也可能是多进程）
+* 线程：每一个进程中，都会启动一个线程用来执行程序中的代码，这个线程被称之为主线程，
+* 所以也可以说：进程是线程的容器
+
+##### 多进程多线程开发
+
+![image-20220330160845621](index.assets/image-20220330160845621.png) 
+
+##### 浏览器和JavaScript
+
+![image-20220330161908864](index.assets/image-20220330161908864.png) 
+
+#### 浏览器中的事件循环
+
+![image-20220330163929398](index.assets/image-20220330163929398.png) 
 
 
 
