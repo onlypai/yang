@@ -1007,9 +1007,139 @@ fs.readFile('./pai.jpg', (err, data)=>{
 
 ![image-20220330163929398](index.assets/image-20220330163929398.png) 
 
+##### 事件处理流程
 
+代码分类：
 
+* 初始化代码（同步代码）：dom事件监听、ajax请求、定时器
+* 回调代码（异步代码）：处理回调逻辑
 
+js引擎执行代码的基本流程
+
+​	`先执行初始化代码，再执行回调代码`
+
+⭐⭐执行流程：
+
+* 执行初始化代码，将事件回调函数交给对应的管理模块
+* 当事件发生时，`事件管理模块`会将回调函数及其数据添加到`回调队列`中
+* 只有当初始化代码执行完后，才会遍历读取回到队列中的回调函数执行
+
+![image-20220330213737064](index.assets/image-20220330213737064.png) 
+
+##### 宏任务(macrotask)、微任务(microtask)
+
+![image-20220330213934074](index.assets/image-20220330213934074.png) 
+
+⭐⭐在队列里面既有宏任务也有微任务的情况下：
+
+* 会`先执行微任务`，当微任务执行完后，会`再执行宏任务队列里面的第一个函数`
+* 第一个函数执行完后不会立马执行下一个函数。而是会判断一下执行宏任务第一个函数的时候`有没有添加新的微任务`
+* 有就先把微任务执行了再执行下一个宏任务  
+
+> 执行宏任务之前，保证微任务队列是空的
+
+##### 面试题*2
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <script>
+      setTimeout(() => {
+        console.log('set1')
+        new Promise((resolve) => {
+          resolve()
+        }).then(() => {
+          new Promise((resolve) => {
+            resolve()
+          }).then(() => {
+            console.log('then4')
+          })
+          console.log('then2')
+        })
+      })
+
+      new Promise((resolve) => {
+        console.log('pr1')
+        resolve()
+      }).then(() => {
+        console.log('then1')
+      })
+
+      setTimeout(() => {
+        console.log('set2')
+      })
+
+      console.log(2)
+
+      queueMicrotask(() => {
+        console.log('queueMicrotask1')
+      })
+
+      new Promise((resolve) => {
+        resolve()
+      }).then(() => {
+        console.log('then3')
+      })
+    </script>
+  </body>
+</html>
+```
+
+![image-20220330221931598](index.assets/image-20220330221931598.png) 
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  </head>
+  <body>
+    <script>
+      async function async1() {
+        console.log('async1 start')
+        await async2()
+        console.log('async1 end')
+      }
+
+      async function async2() {
+        console.log('async2')
+      }
+
+      console.log('script start')
+
+      setTimeout(function () {
+        console.log('setTimeout')
+      }, 0)
+
+      async1()
+
+      new Promise((resolve, reject) => {
+        console.log('promise1')
+        resolve()
+      }).then((res) => {
+        console.log('promise2')
+      })
+
+      console.log('script end')
+    </script>
+  </body>
+</html>
+```
+
+![image-20220330222113596](index.assets/image-20220330222113596.png) 
+
+> **async、await是Promise的一个语法糖: **
+>
+> * 我们可以将**await关键字后面执行的代码**，看做是包裹在`(resolve，reject) = { ... }`中的代码
+> * **await的下面一条语句**，可以看做是`then(res => { ... })`中的代码
+>
+> ![image-20220330222336918](index.assets/image-20220330222336918.png) 
 
 
 
