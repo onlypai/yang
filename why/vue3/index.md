@@ -4931,7 +4931,7 @@ ESLint+Prettier，代码规范，Prettier可以让代码格式化，好看
 
 ### 代码规范
 
-#### 1、editorconfig配置_统一编码风格
+#### 1、editorconfig统一编码风格
 
 EditorConfig 有助于为不同 IDE 编辑器上处理同一项目的多个开发人员维护一致的编码风格。
 
@@ -5065,20 +5065,32 @@ npm install prettier -D
 > 补充：
 >
 > ```js
->     // 使能每一种语言默认格式化规则 `settings.json`
->     "[html]": {
->         "editor.defaultFormatter": "esbenp.prettier-vscode"
->     },
->     "[css]": {
->         "editor.defaultFormatter": "esbenp.prettier-vscode"
->     },
->     "[less]": {
->         "editor.defaultFormatter": "esbenp.prettier-vscode"
->     },
->     "[javascript]": {
->         "editor.defaultFormatter": "esbenp.prettier-vscode"
->     },
+>  // 使能每一种语言默认格式化规则 `settings.json`
+>  "[html]": {
+>      "editor.defaultFormatter": "esbenp.prettier-vscode"
+>  },
+>  "[css]": {
+>      "editor.defaultFormatter": "esbenp.prettier-vscode"
+>  },
+>  "[less]": {
+>      "editor.defaultFormatter": "esbenp.prettier-vscode"
+>  },
+>  "[javascript]": {
+>      "editor.defaultFormatter": "esbenp.prettier-vscode"
+>  },
 > ```
+>
+> prettier插件失效可能原因：
+>
+> ![image-20220331092502065](index.assets/image-20220331092502065.png) 
+>
+> `Require config set to true and no config present. Skipping file.`
+>
+> 解决：扩展设置 > 去掉勾选
+>
+> ![image-20220331092640932](index.assets/image-20220331092640932.png) 
+>
+> 
 
 #### 3、使用ESLint检测
 

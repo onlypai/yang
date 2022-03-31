@@ -1003,7 +1003,7 @@ fs.readFile('./pai.jpg', (err, data)=>{
 
 ![image-20220330161908864](index.assets/image-20220330161908864.png) 
 
-#### 浏览器中的事件循环
+#### `浏览器`中的事件循环
 
 ![image-20220330163929398](index.assets/image-20220330163929398.png) 
 
@@ -1140,6 +1140,120 @@ js引擎执行代码的基本流程
 > * **await的下面一条语句**，可以看做是`then(res => { ... })`中的代码
 >
 > ![image-20220330222336918](index.assets/image-20220330222336918.png) 
+
+#### `node`中的事件循环
+
+##### Node的架构分析
+
+![image-20220331094639839](index.assets/image-20220331094639839.png) 
+
+##### 阻塞IO和非阻塞IO（了解）
+
+![image-20220331111026329](index.assets/image-20220331111026329.png) 
+
+##### 非阻塞IO的问题
+
+![image-20220331112105366](index.assets/image-20220331112105366.png) 
+
+##### 阻塞和非阻塞、同步和异步的区别
+
+阻塞和非阻塞一般说的是`系统调用`
+
+![image-20220331112625743](index.assets/image-20220331112625743.png) 
+
+##### Node事件循环
+
+![image-20220331140127911](index.assets/image-20220331140127911.png) 
+
+##### Node中的微任务和宏任务
+
+![image-20220331140631742](index.assets/image-20220331140631742.png) 
+
+⭐⭐事件循环处理流程：
+
+* 先执行`初始化代码（main script）`
+* 再执行`微任务队列中的process.nextTick`(它是单独队列)，再执行`别的微任务（promise.then、queueMicrotask...）`
+* 最后执行`宏任务队列：timer定时器> 回调函数> IO事件> 检测setImmediate> close事件`
+
+> 第一个宏任务执行完之后检查有没有产生新的微任务，和浏览器事件循环相同
+
+##### 面试题*2
+
+> 面试题中很少会出现IO事件，IO事件是`系统调用`，系统执行完后告诉你，执行时间不确定
+
+1
+
+```js
+async function async1() {
+    console.log('async1 start');
+    await async2()
+    console.log('async1 end');
+}
+
+async function async2() {
+    console.log('async2');
+}
+
+console.log('script start');
+
+setTimeout(function() { console.log('setTimeout0'); }, 0)
+
+setTimeout(() => { console.log('setTimeout2'); }, 300);
+
+setImmediate(() => { console.log('setImmediate'); })
+
+process.nextTick(() => { console.log('nextTick1'); })
+
+async1()
+
+process.nextTick(() => { console.log('nextTick2'); })
+
+new Promise(resolve => {
+    console.log('promise1');
+    resolve()
+    console.log('promise2');
+}).then(res => {
+    console.log('promise3');
+})
+
+console.log('script end');
+```
+
+![image-20220331142315657](index.assets/image-20220331142315657.png) 
+
+2：setTimeout时间设置为0和setImmediate谁先执行
+
+```js
+setTimeout(() => {
+    console.log('setTimeout')
+}, 0)
+setImmediate(() => {
+    console.log('setImmediate');
+})
+```
+
+二者执行顺序不一定
+
+宏任务队列执行顺序：`timer定时器> 回调函数> IO事件> 检测setImmediate> close事件`
+
+搞清楚两点：`事件循环有一个初始化时间，timer定时器加入到事件队列也需要一个时间`
+
+* 事件循环初始化的时间假如是20ms，初始化过后开始执行队列中的事件，假如定时器加入队列所需时间是10ms，这时就会先执行setTimeout，后执行回调函数，再执行check（setImmediate）
+* 但是，假如初始化时间只需要5ms，定时器加入到队列花了10ms，这时会先执行setImmediate，在执行setTimeout  
+
+出现这种情况不是两个队列调换了顺序，而是`加入到队列的时间先后`
+
+### Stream(流)
+
+初识
+
+![image-20220331161804536](index.assets/image-20220331161804536.png) 
+
+文件读写的Stream
+
+可以看作是：需要读取的数据放在管道（缓冲区）中
+
+![image-20220331162202837](index.assets/image-20220331162202837.png) 
 
 
 
