@@ -1245,15 +1245,124 @@ setImmediate(() => {
 
 ### Stream(流)
 
-初识
-
 ![image-20220331161804536](index.assets/image-20220331161804536.png) 
 
-文件读写的Stream
+**文件读写的Stream**
 
 可以看作是：需要读取的数据放在管道（缓冲区）中
 
 ![image-20220331162202837](index.assets/image-20220331162202837.png) 
+
+流的方式读取 
+
+```js
+const fs = require("fs")
+
+//传统方式
+fs.readFile("./aaa.txt", (err, data) => {
+  console.log(data) //<Buffer e4 bd a0 e5 9c a8 e5 b9 b2 e4 bb 80 e4 b9 88>
+})
+
+//流的方式读取
+const reader = fs.createReadStream("./aaa.txt", {
+  start: 3,
+  end: 6,
+  highWaterMark: 2,
+})
+
+//数据读取过程
+// reader.on("data", (data) => {
+//   console.log(data)
+//   //第三个字节到第六个字节（0开始），每次两个字节
+//   //<Buffer e5 9c>
+//   //<Buffer a8 e5>
+// })
+
+//还可以先暂停再继续读取
+reader.on("data", (data) => {
+  console.log(data)
+  reader.pause()
+
+  setTimeout(() => {
+    reader.resume()
+  }, 1500)
+})
+reader.on("open", () => {
+  console.log("文件被打开")
+})
+reader.on("end", () => {
+  console.log("文件读取结束")
+})
+reader.on("close", () => {
+  console.log("文件关闭") //读取操作完成之后关闭
+})
+
+```
+
+流的方式写入
+
+```js
+const fs = require("fs")
+
+// fs.writeFile("./test.txt", "leopaidaxing", { flag: "a" }, (err) => {
+//   console.log(err)
+// })
+
+//流的方式写入
+const writer = fs.createWriteStream("./textStream.txt", {
+  flags: "a",
+  start: 4,
+})
+//写入内容
+writer.write("文件内容", (err) => {
+  if (err) return
+  console.log("写入成功")
+})
+writer.write("第二次写入", (err) => {
+  if (err) return
+  console.log("第二次写入成功")
+})
+
+// writer.close() //很少调用，多调用end()
+//end()方法可以传参；文件内容，写入之后会调用close()将文件关闭
+writer.end('helloworld') 
+
+writer.on("close", () => {
+  console.log("文件已经关闭")
+})
+```
+
+`pipe()`
+
+```js
+const fs = require("fs")
+//文件读取并直接写入到另一个文件中
+
+//传统方法
+// fs.readFile("./aaa.txt", (err, data) => {
+//   if (err) return
+//   fs.writeFile("./writeA.txt", data, (err) => {
+//     console.log(err)
+//   })
+// })
+
+//pipe()
+const reader = fs.createReadStream("./aaa.txt")
+const writer = fs.createWriteStream("./writeB.txt")
+reader.pipe(writer) //将读取到的流直接输出
+writer.close()
+
+```
+
+## node开发服务器
+
+
+
+
+
+
+
+
 
 
 
