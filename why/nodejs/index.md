@@ -1475,7 +1475,7 @@ response是继承自`stream.Writable`的，所以可以使用`.end(),.write(),�
 
 ![image-20220402091609001](index.assets/image-20220402091609001.png) 
 
-##### 响应状态码
+##### [响应状态码](https://tool.oschina.net/commons?type=5)
 
 ![image-20220402164657607](index.assets/image-20220402164657607.png) 
 
