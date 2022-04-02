@@ -1354,9 +1354,168 @@ writer.close()
 
 ```
 
-## node开发服务器
+## node开发web服务器
 
+### web服务器
 
+服务器：提供资源的一台电脑
+
+![image-20220402090126492](index.assets/image-20220402090126492.png) 
+
+> 全局安装`nodemon`，使用nodemon代替node执行js文件：监听文件改变自动重新执行
+
+### http模块
+
+初体验
+
+```js
+const http = require("http")
+
+const server1 = http.createServer((request, response) => {
+  response.end("server1")
+})
+server1.listen(4000, "0.0.0.0", () => {
+  //主机地址默认0.0.0.0
+  console.log("server1已经启动")
+})
+//第一个参数端口号和第二个参数主机都是可选的
+// server1.listen(() => {
+//     console.log('server1已经启动');
+//     console.log(server1.address().port); //可以使用address().port查看端口号
+// })
+
+//方式2
+const server2 = new http.Server((request, response) => {
+  //new http.Server  两种方式并无本质区别
+  response.end("server2")
+})
+server2.listen(4001, () => {
+  console.log("server2已经启动")
+})
+```
+
+两种方式底层实现都是一样的，没有区别，都是`new Server`
+
+#### 主机、端口号
+
+![image-20220402102230425](index.assets/image-20220402102230425.png) 
+
+主机地址写`0.0.0.0`，可以通过localhost、127.0.0.1、电脑的IP地址 三种方式来访问
+
+#### request对象
+
+response继承自`stream.Readable`
+
+url、method、headers
+
+##### method
+
+![image-20220402155912497](index.assets/image-20220402155912497.png) 
+
+```js
+const http = require("http")
+const url = require("url")
+const qs = require("querystring")
+
+const server1 = http.createServer((request, response) => {
+  console.log(request.url) //接口及参数信息  /users
+  console.log(request.method) //请求方式，默认GET请求
+  console.log(request.headers) //请求头
+
+  /**
+   * url相关
+   */
+
+  // console.log(url.parse(request.url)) //url模块有个parse方法可以拿到url对象
+  // const { pathname, query } = url.parse(request.url) //对象解构
+  // console.log(pathname) //例如/login
+  // console.log(query) //例如user=wy&password=123123151
+
+  // console.log(qs.parse(query)) //query对象
+  // const { user, password } = qs.parse(query)
+  // console.log(user) //用户信息内容
+  // console.log(password) //密码信息内容
+
+  /**
+   * method相关
+   * POST:post方式参数是在body里面传入，postman里面点击body，点row，text选为json，即可写json格式的参数
+   */
+  const { pathname } = url.parse(request.url)
+  if (pathname === "/login") {
+    if (request.method === "POST") {
+      //拿到body中的数据
+      // request.setEncoding('utf-8')//文字，视频音频要指定binary，这里指定了编码方式以后下面就可以不用写data.toString()，直接打印data
+      request.on("data", (data) => {
+        //body中写入的时候使用流的方式进行写入的，所以要调用data事件
+        console.log(data) //这里拿到的body数据是Buffer
+        const { username, password } = JSON.parse(data.toString())
+        console.log(username) //用户信息内容
+        console.log(password) //密码信息内容
+      })
+      response.end("server1响应")
+    }
+  }
+})
+server1.listen(4000, "0.0.0.0", () => {
+  console.log("server1已经启动")
+})
+```
+
+##### headers
+
+![image-20220402160604425](index.assets/image-20220402160604425.png) 
+
+#### response对象
+
+##### 响应结果
+
+response是继承自`stream.Writable`的，所以可以使用`.end(),.write(),没有提供.close()`，而且res返回结果是通过`流`的方式返回
+
+调用`.end('aaa')`，相当于先调用`.write('aaa')`，再调用`.end()`
+
+![image-20220402091609001](index.assets/image-20220402091609001.png) 
+
+##### 响应状态码
+
+![image-20220402164657607](index.assets/image-20220402164657607.png) 
+
+```js
+const http = require("http")
+const url = require("url")
+const qs = require("querystring")
+
+const server1 = http.createServer((request, response) => {
+  //设置状态码
+  //方式一：
+  // response.statusCode = 400
+  //方式二
+  // response.writeHead(503)
+
+  //响应头
+  //方式一
+  // response.setHeader('Content-Type', 'text/plain;charset=utf8')
+  //响应什么文件资源，Content-Type就指定什么类型
+  // response.setHeader('Content-Type', 'image/jpeg')
+  //方式二
+  response.writeHead(200, {
+    "Content-Type": "text/html;charset=utf8",
+  })
+
+  //响应结果
+  // response对象有一个write方法，可以给客户端发送响应数据，可以发送多次，但是最后一定要
+  // 用end方法结束响应，不然服务器会一直等待⭐
+  // response.write('null')
+  // response.end()
+  // 很少用write，可以直接在请求结束end里面跟上请求数据
+  response.end("<h1>hello</h1>")
+})
+server1.listen(4000, "0.0.0.0", () => {
+  console.log("server1已经启动")
+})
+
+```
+
+##### [Content-type](https://tool.oschina.net/commons)
 
 
 
