@@ -1452,7 +1452,9 @@ const server1 = http.createServer((request, response) => {
         console.log(username) //用户信息内容
         console.log(password) //密码信息内容
       })
-      response.end("server1响应")
+      request.on('end', () => {
+        response.end('server1响应')
+      })
     }
   }
 })
@@ -1517,9 +1519,131 @@ server1.listen(4000, "0.0.0.0", () => {
 
 ##### [Content-type](https://tool.oschina.net/commons)
 
+#### http模块发送网络请求
 
+```js
+//向其他服务器发送网络请求
+//axios既支持前端（使用的是封装xmlhttprequest），也支持node（使用的是http模块）
 
+const { resolveAny } = require('dns')
+const http = require('http')
+http.get('http://127.0.0.1:4000', (res) => {
+  //res不是结果
+  res.on('data', (data) => {
+    console.log('get请求的结果“', data)
+    console.log(data.toString())
+  })
+  res.on('end', () => {
+    console.log('获取到了get所有结果')
+  })
+})
 
+//POST请求
+//POST请求没有直接的post方法
+const req = http.request(
+  {
+    method: 'POST',
+    hostname: '127.0.0.1',
+    port: 4000,
+  },
+  (res) => {
+    res.on('data', (data) => {
+      console.log('POST请求')
+      console.log(data.toString())
+    })
+    res.on('end', () => {
+      console.log('POST请求已获取所有结果')
+    })
+  }
+)
+req.end() //post请求必须以end方法结束请求
+```
+
+### node中文件上传并存入服务器
+
+文件上传本质就是表单提交，使用post请求
+
+* `raw`方式一般就是传json格式的数据
+* `form-data`方式现在多数都是进行文件上传，但是服务器解析起来也很麻烦，一般是用框架，比如说`express中的multer库`
+
+http原生文件上传写入
+
+> 错误方式❌
+>
+> ```js
+> const http = require('http')
+> const fs = require('fs')
+> 
+> const server = http.createServer((req, res) => {
+>   if (req.url === '/upload') {
+>     if (req.method === 'POST') {
+>       const fileWriter = fs.createWriteStream('./foo.png', { flags: 'a+' })
+>       req.on('data', (data) => {
+>         fileWriter.write(data) //直接将字节流写入,但是字节流是有问题的⭐，其中包含的不只是文件的内容信息，还包含其他信息（写入时不是纯图片数据）
+>       })
+>       req.on('end', () => {
+>         res.end('文件上传成功')
+>       })
+>     }
+>   }
+> })
+> server.listen('4000', () => {
+>   console.log('server start!')
+> })
+> ```
+>
+> ![image-20220406205912652](index.assets/image-20220406205912652.png) 
+>
+> ![image-20220406213055901](index.assets/image-20220406213055901.png) 
+
+```js
+const http = require('http')
+const qs = require('querystring')
+const fs = require('fs')
+
+const server = http.createServer((req, res) => {
+  if (req.url === '/upload') {
+    if (req.method === 'POST') {
+      //⭐图片文件必须设置成二进制的编码，默认是utf-8
+      req.setEncoding('binary')
+
+      let body = '' //用于储存文件信息
+      //获取boundary
+      const totalBoundary = req.headers['content-type'].split(';')[1]
+      const boundary = totalBoundary.split('=')[1]
+    //   console.log(boundary);
+
+      req.on('data', (data) => {
+        //data:拿到的文件数据
+        body += data //body是字符串，data文件数据事buffer，会默认将其转化为字符型
+      })
+      req.on('end', () => {
+        // console.log(body)
+        //处理body,获取中间真正的文件信息才能正确写入
+        //1、获取 Content-Type: image/png (不同文件Content-Type是不同的)
+        const payload = qs.parse(body, '\r\n', ': ')
+        // console.log(payload)
+        const type = payload['Content-Type'] //image/png
+        //在image/png的位置进行截取
+        const typeIndex = body.indexOf(type)
+        const typeLength = type.length
+        let imageData = body.substring(typeIndex + typeLength) //Content-Type: image/png后面的所有数据
+        //3、将中间的两空格去掉
+        imageData = imageData.replace(/^\s\s*/, '') // \r\n\r\n
+        //4、将最后的boundary去掉
+        imageData = imageData.substring(0, imageData.indexOf(`--${boundary}--`))//前后会有--
+
+        fs.writeFile('./foo.png', imageData, 'binary', (err) => {
+          res.end('文件上传成功')
+        })
+      })
+    }
+  }
+})
+server.listen('4000', () => {
+  console.log('server start!')
+})
+```
 
 
 
