@@ -1645,11 +1645,46 @@ server.listen('4000', () => {
 })
 ```
 
-
-
-
-
 ## express
+
+### 认识web框架
+
+![image-20220407222542570](index.assets/image-20220407222542570.png) 
+
+### 初始化项目
+
+#### 安装express
+
+* 方式一：通过`express脚手架`创建应用骨架
+
+安装`express-generator`脚手架
+
+```shell
+# 全局安装脚手架
+npm i -g express-generator
+# 创建项目
+express express-server-demo
+# 安装依赖
+npm i
+# 启动项目
+node[nodemon] bin/www
+```
+
+
+
+* 方式二：从零搭建一个express应用结构
+
+
+
+
+
+
+
+
+
+
+
+
 
 ## koa
 
