@@ -1670,15 +1670,396 @@ npm i
 node[nodemon] bin/www
 ```
 
-
-
 * 方式二：从零搭建一个express应用结构
 
+```shell
+npm init -y
+npm i express
+```
 
+```js
+//1、导入
+const express = require('express')
+//2、创建app  express是一个函数
+const app = express()
 
+// 默认路径请求做操作
+app.get('/', (req, res, next) => {
+  res.end('hello这是默认请求')
+})
+//想发什么请求，就怎么配置
+app.post('/login', (req, res, next) => {
+  res.end('这是post请求~')
+})
 
+//3、监听
+app.listen(8000, () => {
+  console.log('8000端口已经启动')
+})
+```
 
+### 中间件
 
+* express应用程序本质上是`一系列中间件函数的调用`
+* 中间件本质是传递给express一个回调函数
+* 回调函数有三个参数，`请求对象request`，`响应对象response`，`用于执行下一个中间件的next函数`
+
+#### 普通中间件
+
+普通中间件，什么请求、什么url都会匹配上，没有任何限制
+
+> next()不跟参数，跟上参数表示报错⭐
+
+* 这种普通中间件写了多个也是没问题的，`默认会执行第一个`，如果想向下执行，必须执行`next()`
+* next()和res.end()没有必然关系，但是请求-响应周期（res.end）结束，下面的中间件再执行res.end就会报错（结束一次就行了啊）
+* 一般想通过next执行下一个中间件的话，是在最后一个中间件里面执行res.end()结束相应
+
+```js
+const express = require('express')
+const app = express()
+
+//普通中间件
+app.use((req, res, next) => {
+  console.log('注册了第1个普通的中间件')
+  //   res.end('middleware')//这里响应之后还是可以执行next()，执行下一个中间件，但是下面再有end()就会报错
+  next()
+})
+app.use((req, res, next) => {
+  console.log('注册了第2个普通的中间件')
+  next()
+})
+app.use((req, res, next) => {
+  console.log('注册了第3个普通的中间件')
+  res.end('hello middleware')
+})
+
+app.listen(8000, () => {
+  console.log('8000端口已启动')
+})
+```
+
+#### path路径匹配的中间件
+
+只有匹配的url才会匹配上，无论什么请求都可以
+
+```js
+const express = require('express')
+const app = express()
+
+//不管什么中间件只要匹配上就会先执行，如果想执行下一个需要执行next函数
+app.use((req, res, next) => {
+  console.log('注册了第1个普通的中间件')
+  next()
+})
+app.use('/home', (req, res, next) => {
+  console.log('注册了第1个path中间件')
+  next()
+})
+//中间穿插普通中间件，也都是依次执行
+app.use((req, res, next) => {
+  console.log('注册了第2个普通的中间件')
+  next()
+})
+app.use('/home', (req, res, next) => {
+  console.log('注册了第2个path中间件')
+  res.end('path middleware')
+})
+
+app.listen(4000, () => {
+  console.log('4000端口已启动')
+})
+```
+
+#### path路径和method方法匹配的中间件
+
+> 一般没有单独匹配方法的中间件
+
+```js
+const express = require('express')
+const app = express()
+
+//path和method都匹配中间件
+app.use((req, res, next) => {
+  console.log('注册了第1个普通的中间件')
+  next()
+})
+app.get('/home', (req, res, next) => {
+  console.log('注册了第1个path,method中间件')
+  res.end('path home and method middleware')
+})
+app.post('/home', (req, res, next) => {
+  console.log('注册了第2个path,method中间件')
+  res.end('path home and method middleware')
+})
+
+app.listen(4000, () => {
+  console.log('4000端口已启动')
+})
+```
+
+#### 连续注册中间件
+
+```js
+const express = require('express')
+const app = express()
+
+//连续注册中间件 ,连续多个回调函数注册多个中间件
+//只要匹配的上，相同的path和method写多个也没有问题
+app.get('/home', (req, res, next) => {
+  console.log('注册了第1个path,method中间件')
+  next()
+})
+app.get(
+  '/home',
+  (req, res, next) => {
+    console.log('注册了第2个path,method中间件')
+    next()
+  },
+  (req, res, next) => {
+    console.log('注册了第3个path,method中间件')
+    next()
+  },
+  (req, res, next) => {
+    console.log('注册了第4个path,method中间件')
+    res.end('path home and method middleware')
+  }
+)
+
+app.listen(4000, () => {
+  console.log('4000端口已启动')
+})
+```
+
+### 中间件应用-解析请求数据
+
+text格式内容可以直接获取，但是json格式或者其他格式则需要解析
+
+```js
+const express = require('express')
+const app = express()
+
+//json方式
+//这样判断，就会先把json方式请求的数据放在req.body里面，看path和method是什么再在下面的中间件中拿到数据
+app.use((req, res, next) => {
+  if (req.headers['content-type'] === 'application/json') {
+    req.on('data', (data) => {
+      const info = JSON.parse(data.toString())
+      req.body = info //保存在req.body里面⭐
+    })
+    req.on('end', () => {
+      next()
+    })
+  } else {
+    next()
+  }
+})
+
+app.post('/home', (req, res, next) => {
+  console.log(req.body)
+  res.end('home path')
+})
+app.post('/login', (req, res, next) => {
+  console.log(req.body)
+  res.end('login path')
+})
+
+app.listen(8000, () => {
+  console.log('8000端口')
+})
+```
+
+#### `body-parser`解析json和x-www-form-urlencoded格式数据
+
+* `app.use(express.json())`
+* `app.use(express.urlencoded({ extended: true }))`
+
+也是在`请求对象request`的`body`属性中拿到
+
+```js
+const express = require('express')
+const app = express()
+
+//上面这种封装使用一个库实现body-parser，这个库的类似功能(不是这个库)在express的4.16.x版本内置成了函数
+app.use(express.json()) //json格式数据上传⭐
+
+// extended:
+// true:那么对urlencoded进行解析时，它使用的是第三方库:qs √
+// false:那么对urlencoded进行解析时，它使用的是Node内置块:querystring
+app.use(express.urlencoded({ extended: true })) //x-www-form-urlencoded格式数据上传⭐
+
+app.post('/home', (req, res, next) => {
+  console.log(req.body)
+  res.end('home path')
+})
+app.post('/login', (req, res, next) => {
+  console.log(req.body)
+  res.end('login path')
+})
+
+app.listen(8000, () => {
+  console.log('8000端口')
+})
+
+```
+
+#### form-data格式数据解析
+
+一般我们使用form-data会看作是`向服务器上传文件（信息）`
+
+解析form-data格式的数据使用`multer`
+
+```shell
+npm i multer
+```
+
+也是在`请求对象request`的`body`属性中拿到
+
+```js
+const express = require('express')
+const multer = require('multer') //安装、导入multer
+
+const app = express()
+
+const upload = multer() //一般命名为upload
+app.use(upload.any()) //form-data格式上传信息解析方式，any()的作用是可以解析文件类型以外的信息
+
+app.post('/login', (req, res, next) => {
+  console.log(req.body)
+  res.end('用户登录成功')
+})
+
+app.listen(4000, () => {
+  console.log('form-data解析上传服务器开启成功')
+})
+```
+
+```js
+//⭐永远不要将upload.any()作为全局中间件使用
+//连续注册中间件的方式使用，单独给login接口做解析
+app.post('/login', upload.any(), (req, res, next) => {
+  console.log(req.body)
+  res.end('用户登录成功')
+})
+```
+
+![image-20220410154234220](index.assets/image-20220410154234220.png) 
+
+#### form-data文件上传解析
+
+`upload.single(key)`  单文件上传
+
+`upload.array(key, 4)`  多文件上传，最多4个
+
+`upload.fields([
+   { name: 'file', maxCount: 2 },
+   { name: 'haha', maxCount: 2 },
+])`  多文件多字段上传
+
+```js
+const express = require('express')
+const multer = require('multer') //导入multer
+
+const app = express()
+
+const upload = multer({
+  dest: './uploads/', //保存上传的文件在哪个文件夹
+})
+
+//form-data格式文件上传接口
+// file为调用接口传递文件信息的key
+app.post('/upload', upload.single('file'), (req, res, next) => {
+  //中间还要插入一个中间件，用于获取上传的文件并且保存
+  console.log(req.body) //拿到文本域信息
+  console.log(req.file) //拿到文件信息，只上传一个文件
+  res.end('文件上传成功')
+})
+
+// 上传多个文件key都要叫file
+app.post('/uploads', upload.array('file'), (req, res, next) => {
+  //中间还要插入一个中间件，用于获取上传的文件并且保存
+  console.log(req.body) //拿到文本域信息
+  console.log(req.files) //文件信息数组，多个文件
+  res.end('文件上传成功')
+})
+
+app.listen(4000, () => {
+  console.log('form-data解析上传服务器开启成功')
+})
+```
+
+![image-20220410150643752](index.assets/image-20220410150643752.png) 
+
+> ![image-20220410153146835](index.assets/image-20220410153146835.png) 
+>
+> 如果使用了普通中间件`any()`解析，只能在`files数组`中获取文件信息，可以将`any()`定义为连续中间件
+>
+> ![image-20220410154234220](index.assets/image-20220410154234220.png) 
+
+这样上传的文件没有`扩展名`可以使用自定义存储信息来设置：`upload.diskStorage()`
+
+```js
+// const { json } = require('express');
+const path = require('path')
+const express = require('express')
+const multer = require('multer') //导入multer
+
+const app = express()
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+
+const storage = multer.diskStorage({
+  //文件保存位置
+  destination: (req, file, cb) => {
+    cb(null, './uploads/') //cb是回调函数，第一个参数是错误信息
+  },
+  //定义上传的文件名字
+  filename: (req, file, cb) => {
+    //名字用时间戳来命名，避免同名覆盖，path.extname是获取文件扩展名，file.originalname就是上传的文件原始名字，原始名字一般不会保存，避免重复
+    cb(null, Date.now() + path.extname(file.originalname))
+  },
+})
+const upload = multer({
+  // dest: './uploads/' //保存上传的文件在哪个文件夹
+  storage, //自定义存储信息：上传的文件保存并定义文件名字
+})
+
+// form-data格式上传文本域信息接口
+//form-data格式上传信息解析方式，any()的作用是可以解析文件类型以外的信息(文本域信息)
+app.post('/login', upload.any(), (req, res, next) => {
+  console.log(req.body)
+  res.end('用户登录成功')
+})
+
+// app.post('/upload', upload.single('file'), (req, res, next) => {
+//   //中间还要插入一个中间件，用于获取上传的文件并且保存
+//   console.log(req.body) //拿到文本域信息
+//   console.log(req.file) //拿到文件信息，只上传一个文件
+//   console.log(req.files) //文件信息数组，多个文件
+//   res.end('文件上传成功')
+// })
+
+//多个key字段上传
+app.post(
+  '/upload',
+  upload.fields([
+    { name: 'file', maxCount: 2 },
+    { name: 'haha', maxCount: 2 },
+  ]),
+  (req, res, next) => {
+    //中间还要插入一个中间件，用于获取上传的文件并且保存
+    console.log(req.body) //拿到文本域信息
+    console.log(req.file) //拿到文件信息，只上传一个文件
+    console.log(req.files) //文件信息数组，多个文件
+    res.end('文件上传成功')
+  }
+)
+
+app.listen(4000, () => {
+  console.log('form-data解析上传服务器开启成功')
+})
+
+```
 
 
 
