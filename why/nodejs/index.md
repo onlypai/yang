@@ -2061,7 +2061,168 @@ app.listen(4000, () => {
 
 ```
 
+### 中间件应用-日志信息morgan
 
+```shell
+npm i morgan
+```
+
+```js
+const express = require('express')
+const morgan = require('morgan') //第三方模块
+const fs = require('fs')
+
+const app = express()
+
+const writerStream = fs.createWriteStream('./logs/access.log', {
+  //每次日志信息都会保存到这里
+  flags: 'a+', //日志信息追加
+})
+//普通中间件，所有请求都会打印日志信息，可以使用连续中间件打印某个请求的信息
+app.use(morgan('combined', { stream: writerStream }))
+
+app.get('/', (req, res, next) => {
+  res.end('保存日志信息')
+})
+
+app.listen(4000, () => {
+  console.log('4000')
+})
+
+```
+
+### 客户端发送请求的方式
+
+![image-20220411205126994](index.assets/image-20220411205126994.png) 
+
+```js
+const express = require('express')
+const app = express()
+
+//params
+app.get('/products/:id/:name', (req, res, next) => {
+  console.log(req.params) //params对象//{ id: '001', name: 'wangyang' }
+  res.end('params参数~')
+})
+
+//query
+app.get('/login', (req, res, next) => {
+  console.log(req.query) //query对象//{ username: 'wangyang', password: '121654' }
+  res.end('用户登陆成功~')
+})
+
+app.listen(4000, () => {
+  console.log('4000端口已启动')
+})
+```
+
+### [request](https://www.expressjs.com.cn/5x/api.html#req.body)请求对象
+
+![image-20220411210542629](index.assets/image-20220411210542629.png) 
+
+### [response](https://www.expressjs.com.cn/5x/api.html#res)对象
+
+`res.json()`
+
+```js
+const express = require('express')
+const app = express()
+
+app.get('/', (req, res, next) => {
+    res.status(200) //设置响应状态码
+  //响应结果为string类型
+  //   res.end('hello~')
+
+  //响应结果为json类型
+  //方式一：设置type
+  //   res.type('application/json')
+  //   res.end(JSON.stringify({ name: 'aaa', age: '18' }))
+
+  // 方式二：express中响应结果为对象时：可以使用.json方式，这种方式开发时用的多
+  res.json({ name: 'hahah', age: 18 }) //会直接把对象转化为json
+  //   res.json(['name', 'age']) //数组也没有问题
+})
+
+app.listen(4000, () => {
+  console.log('4000端口已启动')
+})
+```
+
+![image-20220411211956129](index.assets/image-20220411211956129.png) 
+
+### express路由
+
+![image-20220411212408075](index.assets/image-20220411212408075.png) 
+
+基本使用
+
+![image-20220411214600651](index.assets/image-20220411214600651.png) 
+
+### 静态资源服务器
+
+```js
+const express = require('express')
+const app = express()
+
+app.use(express.static('./dist'))
+
+app.listen(3000, '192.168.31.172', () => {
+    console.log('3000端口已启动');
+})
+```
+
+### express错误处理
+
+```js
+const express = require('express')
+const app = express()
+
+app.get('/login', (req, res, next) => {
+  const isLogin = false //模拟错误
+  if (isLogin) {
+    res.json('login message~')
+  } else {
+    next(new Error('USERS_NAME_DOES_NOT_EXISTS')) //next函数中抛出错误并带上参数，这样就会执行下面的四个参数的专门执行错误的中间件
+  }
+})
+
+app.get('/register', (req, res, next) => {
+  const isRegister = true
+  if (!isRegister) {
+    res.json('register success~')
+  } else {
+    next(new Error('USERS_NAME_ALREADY_EXISTS'))
+  }
+})
+
+//执行错误的中间件（当参数为四个的时候，执行错误）⭐
+app.use((err, req, res, next) => {
+  let status = 400
+  let errMessage = ''
+
+  switch (err.message) {
+    case 'USERS_NAME_DOES_NOT_EXISTS':
+      status = 400
+      errMessage = 'users name does not exists'
+      break
+    case 'USERS_NAME_ALREADY_EXISTS':
+      status = 401
+      errMessage = 'users name already exists'
+      break
+    default:
+      status = 404
+      errMessage = 'NOT FOUND~'
+  }
+  res.status(status)
+  res.json({
+    errCode: status,
+    errMessage: errMessage,
+  })
+})
+app.listen(4000, () => {
+  console.log('4000端口已启动')
+})
+```
 
 
 
