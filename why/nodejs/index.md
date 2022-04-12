@@ -1712,7 +1712,8 @@ app.listen(8000, () => {
 
 * 这种普通中间件写了多个也是没问题的，`默认会执行第一个`，如果想向下执行，必须执行`next()`
 * next()和res.end()没有必然关系，但是请求-响应周期（res.end）结束，下面的中间件再执行res.end就会报错（结束一次就行了啊）
-* 一般想通过next执行下一个中间件的话，是在最后一个中间件里面执行res.end()结束相应
+* 一般想通过next执行下一个中间件的话，是在最后一个中间件里面执行res.end()结束响应
+* 中间件执行完了依然没有`res.end()`返回结果就会返回`not found`⭐
 
 ```js
 const express = require('express')
@@ -2101,13 +2102,13 @@ const app = express()
 
 //params
 app.get('/products/:id/:name', (req, res, next) => {
-  console.log(req.params) //params对象//{ id: '001', name: 'wangyang' }
+  console.log(req.params) //params对象  { id: '001', name: 'wangyang' }
   res.end('params参数~')
 })
 
 //query
 app.get('/login', (req, res, next) => {
-  console.log(req.query) //query对象//{ username: 'wangyang', password: '121654' }
+  console.log(req.query) //query对象  { username: 'wangyang', password: '121654' }
   res.end('用户登陆成功~')
 })
 
@@ -2140,7 +2141,7 @@ app.get('/', (req, res, next) => {
 
   // 方式二：express中响应结果为对象时：可以使用.json方式，这种方式开发时用的多
   res.json({ name: 'hahah', age: 18 }) //会直接把对象转化为json
-  //   res.json(['name', 'age']) //数组也没有问题
+  //   res.json(['name', 'age']) //数组、字符串...都没有问题
 })
 
 app.listen(4000, () => {
@@ -2166,6 +2167,7 @@ const app = express()
 
 app.use(express.static('./dist'))
 
+//本地ip
 app.listen(3000, '192.168.31.172', () => {
     console.log('3000端口已启动');
 })
@@ -2224,11 +2226,44 @@ app.listen(4000, () => {
 })
 ```
 
-
-
-
-
 ## koa
+
+![image-20220412152516862](index.assets/image-20220412152516862.png) 
+
+### 初始化
+
+中间件执行完了依然没有`res.end()`返回结果就会返回`not found`⭐
+
+```shell
+npm init -y
+npm i koa
+```
+
+```js
+const Koa = require("koa") //返回的是一个类Application
+const app = new Koa()
+
+app.use((ctx, next) => {
+  console.log(ctx.response)
+  console.log(ctx.request)
+  //ctx上下文对象
+  ctx.response.body = "hello world" //相当于原生的res.end('hello world')
+  // ctx.body = 'Hello World';
+})
+app.listen(4000, () => {
+  console.log("koa4000端口已启动")
+})
+```
+
+
+
+
+
+
+
+
+
+
 
 ## express和koa对比
 
