@@ -2255,18 +2255,253 @@ app.listen(4000, () => {
 })
 ```
 
+### 中间件注册
 
+与express不同，koa`没有`以下三种方式⭐
 
+* 1、没有methods方式：
 
+​		app.get()或者app.post()...
 
+* 2、没有path方式:
 
+​		app.use('/home',()=>{})
 
+* 3、没有连续注册方式：
 
+​		app.use('/home',(req,res)=>{},(req,res)=>{},(req,res)=>{},)
 
+```js
+//通过这种方式
+app.use((ctx, next) => {
+  //只能手动判断path和method
+  if (ctx.request.url === "/home") {
+    if (ctx.request.method === "GET") {
+      console.log("haha")
+      ctx.response.body = "hello world"
+    }
+  }
+  //koa里面，响应两次不会报错
+  ctx.response.body = "hello world"
+})
+//想要连续注册就只能多写几个app.use()
+app.listen(3000, () => {
+  console.log("koa3000端口已启动")
+})
+```
 
+### koa路由
+
+`koa-router`: 社区提供的第三方路由插件
+
+```shell
+npm i koa-router
+```
+
+koa路由中可以使用path匹配方式、method匹配方式、连续注册方式⭐
+
+![image-20220413093959206](index.assets/image-20220413093959206.png) 
+
+### request参数解析
+
+#### params、query
+
+```js
+const Koa = require("koa")
+const app = new Koa()
+
+const Router = require("koa-router")
+const userRrouter = new Router({ prefix: "/user" })
+
+userRrouter.get("/:id", (ctx, next) => {
+  //user/1321?username=wangyang&password=11561
+  console.log(ctx.request.query) //{ username: 'wangyang', password: '11561' }
+  console.log(ctx.request.params) //{ id: '1321' }
+  ctx.response.body = "hahhahhahha"
+})
+
+app.use(userRrouter.routes())
+
+// app.use((ctx, next) => {
+//     console.log(ctx.request.url); // /1321?username=wangyang&password=11561
+//     console.log(ctx.request.path); // /1321
+//     console.log(ctx.request.query); //{ username: 'wangyang', password: '11561' }
+//     console.log(ctx.request.params); //undefined 这样拿不到，想要拿到需手动解析ctx.request.url,要使用路由才能拿到
+//     ctx.response.body = 'hello world'
+// })
+
+app.listen(4000, () => {
+  console.log("koa4000端口已启动")
+})
+```
+
+#### json、x-www-form-urlencoded
+
+`json`、`x-www-form-urlencoded`使用第三方库`koa-bodyparser`
+
+从`ctx.request.body`中获取数据
+
+`form-data`使用第三方库`koa-multer`
+
+从`ctx.req.body`中获取数据⭐
+
+> koa-multer库获取信息都是在`req`对象里面
+
+```shell
+npm i koa-bodyparser
+npm i koa-multer
+```
+
+```js
+const Koa = require("koa")
+const app = new Koa()
+
+const bodyParser = require("koa-bodyparser")
+app.use(bodyParser()) //导入koa-bodyparser并使用
+
+const multer = require("koa-multer")
+const upload = multer()
+
+app.use(upload.any()) //导入koa-multer注册并使用
+
+app.use((ctx, next) => {
+  console.log(ctx.request.body) //json和urlencoded格式
+
+  console.log(ctx.req.body) //form-data格式获取是通过req对象⭐
+  ctx.response.body = "hahhahhahha"
+})
+
+app.listen(4000, () => {
+  console.log("koa4000端口已启动")
+})
+```
+
+> 尽量不要使用全局中间件`upload.any()`，需要时在单独请求中使用连续注册中间件
+
+#### form-data文件上传解析
+
+使用`koa-multer`
+
+```js
+const Koa = require("koa")
+const multer = require("koa-multer")
+const Router = require("koa-router")
+const path = require("path")
+
+const app = new Koa()
+const uploadRouter = new Router({ prefix: "/upload" })
+
+const storage = multer.diskStorage({
+  //文件保存位置
+  destination: (req, file, cb) => {
+    cb(null, "./uploads/") //cb是回调函数，第一个参数是错误信息
+  },
+  //定义上传的文件名字
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname))
+  },
+})
+const upload = multer({
+  // dest:'./uploads',
+  storage,
+})
+uploadRouter.post("/avatar", upload.array("file"), (ctx, next) => {
+  console.log(ctx.req.file) //上传单个文件可以直接用file拿到
+  console.log(ctx.req.files) //multer库信息都放在req对象里面
+  ctx.response.body = "图片上传成功"
+})
+app.use(uploadRouter.routes())
+
+app.listen(4000, () => {
+  console.log("koa4000端口已启动")
+})
+
+```
+
+### response响应
+
+![image-20220413143116072](index.assets/image-20220413143116072.png) 
+
+```js
+const Koa = require("koa")
+const app = new Koa()
+
+app.use((ctx, next) => {
+  //响应状态码
+  // ctx.response.status = 404
+  //响应数据
+  // ctx.response.body='haha'
+
+  // ctx.response.body = {
+  //     name: 'haha',
+  //     age: 15
+  // }
+
+  // ctx.response.body = ['age', 'name']
+
+  ctx.status = 404
+  ctx.body = "haha" //实际上就是在执行ctx.response.body⭐
+})
+
+app.listen(4000, () => {
+  console.log("koa4000端口已启动")
+})
+```
+
+### 静态资源服务器
+
+使用第三方库`koa-static`
+
+```shell
+npm i koa-static
+```
+
+```js
+const Koa = require("koa")
+const app = new Koa()
+
+const koaStatic = require("koa-static")
+app.use(koaStatic("./dist"))
+
+app.listen(3000, "192.168.0.108", () => {
+  console.log("koa3000端口已启动")
+})
+```
+
+### koa错误处理
+
+koa中错误处理使用`事件发出`与`事件接受`的形式
+
+```js
+const Koa = require("koa")
+const app = new Koa()
+
+app.use((ctx, next) => {
+  const isLogin = false
+  if (!isLogin) {
+    // ctx里面存在app对象，可以直接使用⭐
+    ctx.app.emit("error", new Error("您还没有登录~"), ctx)
+    // ctx.app.emit('error', new Error('您还没有登录~'), ctx)
+  }
+})
+app.on("error", (err, ctx) => {
+  //根据错误信息做相应的逻辑判断
+  ctx.status = 401
+  ctx.body = err.message //错误信息
+})
+
+app.listen(3000, () => {
+  console.log("koa3000端口已启动")
+})
+```
 
 ## express和koa对比
 
 
 
+
+
  
+
+
+
