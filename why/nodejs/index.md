@@ -1,4 +1,4 @@
-## 引入
+引入
 
 源码：4- 44分
 
@@ -2576,6 +2576,156 @@ app.listen(3000, () => {
 dispatch就是next函数，只是习惯写成next
 
 ## MySQL
+
+### 邂逅
+
+#### 常见数据库类型
+
+![image-20220414214525247](index.assets/image-20220414214525247.png) 
+
+#### Windows MySQL安装卸载
+
+##### 安装
+
+![image-20220414215105560](index.assets/image-20220414215105560.png) 
+
+![image-20220414215338048](index.assets/image-20220414215338048.png) 
+
+![image-20220414215754293](index.assets/image-20220414215754293.png) 
+
+##### 卸载
+
+* 卸载程序中关于MySQL的全部卸载
+* 删除安装路径中残留的MySQL文件夹
+
+![image-20220414220710736](index.assets/image-20220414220710736.png) 
+
+#### 启动MySQL
+
+命令
+
+```shell
+# 管理员身份打开终端⭐
+
+net start mysql80 #忽略大小写
+net stop mysql80
+# 查看已开启的服务
+net start
+```
+
+图形界面
+
+* windows
+
+![image-20220414221749783](index.assets/image-20220414221749783.png) 
+
+* mac
+
+![image-20220414222000954](index.assets/image-20220414222000954.png) 
+
+#### 终端中操作数据库
+
+> 将MySQL添加到环境变量，以方便在终端中使用`mysql命令`
+>
+> ![image-20220414223650124](index.assets/image-20220414223650124.png) 
+>
+> mac中添加MySQL环境变量
+>
+> ```shell
+> export PATH=$PATH:/usr/local/mysql/bin
+> ```
+
+```shell
+mysql --version
+
+# 登录数据库
+mysql -uroot -p #折行后无形输入密码
+mysql -uroot -p123456
+
+# 查看数据库(sql语句后面都要加 ;⭐)
+show databases;
+# 创建数据库
+create database coderhub;
+# 查看正在使用的数据库
+select database();
+# 进入某个数据库
+use coderhub;
+
+# 查看表
+show tables;
+# 创建表
+create table users(
+	name varchar(10),
+	age int,
+	height double);
+# 查看表中所有数据
+select * form users;
+# 插入数据
+insert into users (name, age, height) values ('lilei', 24, 1.78);
+```
+
+```shell
+C:\Windows\system32>mysql -uroot -p
+Enter password: ************
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.28 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2022, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+```
+
+![image-20220414224830181](index.assets/image-20220414224830181.png) 
+
+#### GUI工具
+
+![image-20220414231213497](index.assets/image-20220414231213497.png) 
+
+[Navicat Premium](https://www.formysql.com/xiazai.html)高贵版
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
