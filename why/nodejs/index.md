@@ -2497,11 +2497,93 @@ app.listen(3000, () => {
 
 ## express和koa对比
 
+![image-20220414154804280](index.assets/image-20220414154804280.png) 
+
+![image-20220414155014041](index.assets/image-20220414155014041.png) 
+
+express和koa中间件都是是同步执行，执行next()会执行下一个中间件，而不是执行下面的代码
+
+express
+
+```js
+const express = require("express")
+const app = express()
+const axios = require("axios")
+const middleware1 = (req, res, next) => {
+  req.message = "aa"
+  next()
+  res.end(req.message)
+}
+const middleware2 = (req, res, next) => {
+  req.message += "bb"
+  next()
+}
+const middleware3 = (req, res, next) => {
+  // req.message += 'cc' //cc是同步数据，可以拿到aabbcc
+
+  //这时候在第一个middleware中就得不到数据，只能得到aabb，当然你可以将该异步请求封装成函数使用async，但是在中间件中处理显的乏力
+  axios.get("http://152.136.185.210:8000/api/w6/recommend").then((data) => {
+    req.message += data.data.data.context.currentTime
+  })
+}
+
+app.use(middleware1, middleware2, middleware3)
+app.listen(3000, () => {
+  console.log("3000端口已启动")
+})
+```
+
+> `express 中next()返回的不是promise对象`，express框架在处理异步的时候就有点乏力
+
+koa
+
+```js
+const Koa = require("koa")
+const app = new Koa()
+const axios = require("axios")
+const middleware1 = async (ctx, next) => {
+  ctx.message = "aa"
+  await next()
+  ctx.body = ctx.message // aabb1540114164
+}
+const middleware2 = async (ctx, next) => {
+  ctx.message += "bb"
+  await next()
+}
+const middleware3 = async (ctx, next) => {
+  const data = await axios.get("http://152.136.185.210:8000/api/w6/recommend")
+  ctx.message += data.data.data.context.currentTime
+}
+app.use(middleware1)
+app.use(middleware2)
+app.use(middleware3)
+
+app.listen(3000, () => {
+  console.log("3000端口已启动")
+})
+```
+
+> `koa中next()函数返回的是一个promise`
+>
+> koa中同步数据和express一样能达到需求
+>
+> 异步请求的数据也可以通过`async函数`同步执行，就是因为next函数返回的是peomise，所以可以使用await
+>
+> express中使用await是无效的
+
+ ![image-20220414163105804](index.assets/image-20220414163105804.png) 
+
+dispatch就是next函数，只是习惯写成next
+
+## MySQL
 
 
 
 
- 
+
+
+
+
 
 
 
