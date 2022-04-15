@@ -2693,11 +2693,41 @@ mysql> show databases;
 
 ![image-20220414224830181](index.assets/image-20220414224830181.png) 
 
+> ```shell
+> # Mysql8.0设置允许root用户远程访问
+> create user 'root'@'%' identified by 'PASSWD'; 
+> grant all privileges on *.* to 'root'@'%';
+> # 重载授权表
+> FLUSH PRIVILEGES;
+> 
+> 
+> # MYSQL 2059问题
+> ALTER USER 'root'@'localhost' IDENTIFIED BY '你的密码' PASSWORD EXPIRE NEVER; #修改加密规则
+> ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '你的密码'; #修改密码规则
+> FLUSH PRIVILEGES;
+> ```
+
 #### GUI工具
 
 ![image-20220414231213497](index.assets/image-20220414231213497.png) 
 
 [Navicat Premium](https://www.formysql.com/xiazai.html)高贵版
+
+### SQL语句
+
+![image-20220415153258195](index.assets/image-20220415153258195.png) 
+
+分类
+
+![image-20220415153538350](index.assets/image-20220415153538350.png) 
+
+### DDL
+
+```sql
+
+```
+
+
 
 
 
