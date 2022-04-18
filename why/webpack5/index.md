@@ -1115,7 +1115,7 @@ module.exports = {
 
 ### require.context()实现工程自动化
 
-如果需要导入某个文件夹中的所有模块，可以使用`require.context()`，他会遍历该文件夹中文件并且自动导入，使你不需要写很多`import` 语法来导入文件
+如果需要导入某个文件夹中的所有模块，可以使用`require.context()`，会遍历该文件夹中文件并且自动导入，使你不需要写很多`import` 语法来导入文件
 
 该方法传递三个参数：
 
@@ -1158,8 +1158,257 @@ routeFiles.keys().forEach((e) => {
 ```js
 const arr = []
 routeFiles.keys().forEach((e) => {
-  const res = require('@/router/main' + e.split('.')[1])
-  arr.push(res.default)//这个数组保存的就是所有的模块
+  const res = require('@/router/main' + e.split('.')[1])//@/router/main/analysis/dashboard/dashboard.ts
+  arr.push(res.default)//这个数组保存的就是所有的模块，res.default才是模块
 })
+```
+
+### webpack项目优化
+
+#### **1、生产环境关闭**`productionSourceMap`**、**`css sourceMap`
+
+`SourceMap`就是当页面出现某些错误，能够定位到具体的某一行代码
+
+```js
+const isProduction = process.env.NODE_ENV === 'production' 
+// 判断是否是生产环境 
+module.exports = {     
+  productionSourceMap: !isProduction, //关闭生产环境下的SourceMap映射文件 
+  css: {         
+    sourceMap: !isProduction, // css sourceMap 配置 
+    loaderOptions: {             
+    ...其它代码         
+   }     
+  },     
+  ...其它代码 
+}
+```
+
+#### **2、使用`webpack-bundle-analyzer`分析大文件**
+
+安装 `npm install webpack-bundle-analyzer -D` 插件，打包后会生产一个本地服务，清楚的展示打包文件的包含关系和大小。
+
+```js
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin  
+module.exports = {     
+   ...其它     
+   configureWebpack: [         
+   plugins: [             
+      new BundleAnalyzerPlugin() // 分析打包大小使用默认配置         
+   ]    
+  },  
+ ...其它 
+}
+```
+
+**使用cdn加载第三方js**
+
+通过`cdn`的方式在`html`中的`script`标签中直接使用，一方面减少打包体积，一方面提高了加载速度。可以使用`BootCDN`
+
+> 注意，一定要选择自己项目对应的版本，否则会出现各种奇怪的问题
+
+**第一步：配置**`vue.config.js`，让`webpack`不打包这些js，而是通过`script`标签加入。
+
+```js
+ const isProduction = process.env.NODE_ENV === 'production' // 判断是否是生产环境
+//正式环境不打包公共js
+let externals = {}
+//储存cdn的文件
+let cdn = {
+    css: [
+        'https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.0/theme-chalk/index.min.css' // element-ui css 样式表
+    ],
+    js: []
+}
+//正式环境才需要
+if (isProduction) {
+    externals = { //排除打包的js
+        //左侧是npm包的名称，右侧是在代码中暴露的全局变量⭐
+        vue: 'Vue',
+        'element-ui': 'ELEMENT',
+        echarts: 'echarts',
+    }
+    cdn.js = [
+        'https://cdn.bootcdn.net/ajax/libs/vue/2.6.11/vue.min.js', // vuejs
+        'https://cdn.bootcdn.net/ajax/libs/element-ui/2.6.0/index.js', // element-ui js
+        'https://cdn.bootcdn.net/ajax/libs/element-ui/2.6.0/locale/zh-CN.min.js',
+        'https://cdn.bootcdn.net/ajax/libs/echarts/5.1.2/echarts.min.js',
+    ]
+}
+module.exports = {
+//...其它配置
+configureWebpack: {
+        //常用的公共js 排除掉，不打包 而是在index添加cdn，
+        externals, 
+        //...其它配置
+    },
+chainWebpack: config => {
+        //...其它配置  
+        // 注入cdn变量 (打包时会执行)
+        config.plugin('html').tap(args => {
+            args[0].cdn = cdn // 配置cdn给插件
+            return args
+        })
+    }
+//...其它配置     
+}
+```
+
+**第二步：html模板中加入定义好的cdn变量使用的代码**
+
+```html
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>web</title>
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <!-- 引入样式 -->
+    <% for(var css of htmlWebpackPlugin.options.cdn.css) { %>
+       <link rel="stylesheet" href="<%=css%>" >
+    <% } %>
+
+    <!-- 引入JS -->
+    <% for(var js of htmlWebpackPlugin.options.cdn.js) { %>
+       <script src="<%=js%>"></script>
+    <% } %>
+</head>
+<body>
+    <section id="app"></section>
+</body>
+</html>
+```
+
+#### **3、使用`import()`进行懒加载**
+
+```js
+//1.script标签中注释掉 import Table2Excel from "table2excel.js";
+
+//2.下载的方法中：
+download(){
+    //使用import().then()方式
+    import("table2excel.js").then((Table2Excel) => {
+        new Table2Excel.default("#table").export('filename') //多了一层default 
+    })
+}
+```
+
+#### **4、开启`gzip`压缩**
+
+通过 `compression-webpack-plugin` 插件把代码压缩为gzip。**但是！需要服务器支持**
+
+```js
+//打包压缩静态文件插件
+const CompressionPlugin = require("compression-webpack-plugin")
+
+//...其它配置
+module.exports = {
+    //...其它配置
+    chainWebpack: config => {
+        //生产环境开启js\css压缩
+        if (isProduction) {
+            config.plugin('compressionPlugin').use(new CompressionPlugin({
+                test: /\.(js)$/, // 匹配文件名
+                threshold: 10240, // 对超过10k的数据压缩
+                minRatio: 0.8,
+                deleteOriginalAssets: true // 删除源文件
+            }))
+        }
+    }
+    //...其它配置
+}
+```
+
+服务器端配置：**nginx开启静态压缩** 
+
+### vue.config.js配置解析
+
+```js
+"use strict"
+const path = require("path")
+
+function resolve(dir) {
+  return path.join(__dirname, dir)
+}
+
+const port = process.env.port || process.env.npm_config_port || 3000 // dev port
+
+const isProd = process.env.NODE_ENV === "production"
+
+// All configuration item explanations can be find in https://cli.vuejs.org/config/
+module.exports = {
+  // publicPath: "/", //部署路径，如果你的应用被部署在 https://www.my-app.com/my-app/，则设置 publicPath 为 /my-app/  Default: '/'
+  // outputDir: "dist", //生成的生产环境构建文件的目录，注意目标目录的内容在构建之前会被清除 (构建时传入 --no-clean 可关闭该行为)。Default: 'dist'
+  assetsDir: "static", //放置生成的静态资源 (js、css、img、fonts) 的 (相对于 outputDir 的) 目录。  Default: ''
+  // indexPath: "index.html", //指定生成的 index.html 的输出路径 (相对于 outputDir)。也可以是一个绝对路径。Default: 'index.html'
+  /**
+   * 是否在开发环境下通过 eslint-loader 在每次保存时 lint 代码。这个值会在 @vue/cli-plugin-eslint 被安装之后生效。
+   * 1.设置为 true 或 'warning' 时，eslint-loader 会将 lint 错误输出为编译警告。默认情况下，警告仅仅会被输出到命令行，且不会使得编译失败。
+   * 2.lintOnSave: 'default'。这会强制 eslint-loader 将 lint 错误输出为编译错误，同时也意味着 lint 错误将会导致编译失败。
+   * 3.设置为 error 将会使得 eslint-loader 把 lint 警告也输出为编译错误，这意味着 lint 警告将会导致编译失败。
+   * 4.浏览器 overlay  同时显示警告和错误(devServer中)
+   */
+  lintOnSave: true,
+  // lintOnSave: !isProd, //生产构建时禁用 eslint-loader
+  // runtimeCompiler: false, //是否使用包含运行时编译器的 Vue 构建版本。设置为 true 后你就可以在 Vue 组件中使用 template 选项了，但是这会让你的应用额外增加 10kb 左右。Default: false
+  /**
+   * 默认情况下 babel-loader 会忽略所有 node_modules 中的文件。你可以启用本选项，以避免构建后的代码中出现未转译的第三方依赖。
+   * 不过，对所有的依赖都进行转译可能会降低构建速度。
+   * 可以只转译部分特定的依赖：给本选项传一个数组，列出需要转译的第三方包包名或正则表达式即可。
+   */
+  // transpileDependencies: false,
+  productionSourceMap: false, //不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
+  devServer: {
+    // overlay: {
+    //   warnings: true,
+    //   errors: true
+    // },
+    port: port,
+    open: "true",
+    // 前端应用和后端 API 服务器没有运行在同一个主机上，你需要在开发环境下将 API 请求代理到 API 服务器
+    proxy: {
+      "/api": {
+        target: "http://192.168.3.171:8081",
+        ws: true,//代理websockets
+        secure: false, // https
+        changeOrigin: true,
+        pathRewrite: {
+          "^/api": "/api"
+        }
+      }
+    }
+  },
+  css: {
+    sourceMap: !isProd, //是否为 CSS 开启 source map。设置为 true 之后可能会影响构建的性能。
+    loaderOptions: {
+      /**
+       * 默认情况下 `sass` 选项会同时对 `sass` 和 `scss` 语法同时生效，因为 `scss` 语法在内部也是由 sass-loader 处理的
+       * 在配置 `prependData` 选项的时候，`scss` 语法会要求语句结尾必须有分号，`sass` 则要求必须没有分号⭐
+       */
+      scss: {
+        //全局使用scss文件中的变量
+        prependData: `@import "./src/styles/index.scss";`,// 注意：在 sass-loader v8 中，这个选项名是 "prependData"⭐
+        // additionalData: `@import "./src/styles/index.scss";`
+      }
+    }
+  },
+  /**
+   * 这个值是一个对象:会被 webpack-merge 合并入最终的 webpack 配置。
+   * 如果这个值是一个函数:会接收被解析的配置作为参数。该函数既可以修改配置并不返回任何东西，也可以返回一个被克隆或合并过的配置版本。
+   */
+  configureWebpack: {
+    name: "aaaaaaaaaaaaaaaaaaaaaa",
+    resolve: {
+      alias: {
+        // "@": resolve("src") //默认设置了
+      }
+    }
+  },
+  //是一个函数，会接收一个基于 webpack-chain 的 ChainableConfig 实例。允许对内部的 webpack 配置进行更细粒度的修改。链式操作
+  chainWebpack: (config) => {}
+}
 ```
 
