@@ -10,3 +10,8 @@ CREATE TABLE IF NOT EXISTS `students` (
 
 # 删除表
 DROP TABLE IF EXISTS `students`;
+
+# 查看表结构
+DESC users;
+SHOW CREATE TABLE `users`;
+

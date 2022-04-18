@@ -2642,6 +2642,8 @@ mysql --version
 mysql -uroot -p #折行后无形输入密码
 mysql -uroot -p123456
 
+select version();
+
 # 查看数据库(sql语句后面都要加 ;⭐)
 show databases;
 # 创建数据库
@@ -2720,6 +2722,24 @@ mysql> show databases;
 分类
 
 ![image-20220415153538350](index.assets/image-20220415153538350.png) 
+
+### SQL数据类型
+
+数字类型、日期和时间类型、字符串（字符和字节）类型、控件类型、JSON数据类型
+
+![image-20220418095811528](index.assets/image-20220418095811528.png) 
+
+![image-20220418100748946](index.assets/image-20220418100748946.png) 
+
+![image-20220418101126024](index.assets/image-20220418101126024.png) 
+
+### 表约束
+
+![image-20220418102356072](index.assets/image-20220418102356072.png) 
+
+![image-20220418102634777](index.assets/image-20220418102634777.png) 
+
+
 
 ### DDL
 
