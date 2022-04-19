@@ -2737,17 +2737,92 @@ mysql> show databases;
 
 ![image-20220418102356072](index.assets/image-20220418102356072.png) 
 
-![image-20220418102634777](index.assets/image-20220418102634777.png) 
+![image-20220418102634777](index.assets/image-20220418102634777.png)默认就是`NOT NULL` 
 
 
 
 ### DDL
 
-```sql
+对数据库 增删改
 
+```sql
+# 查看所有数据库
+SHOW DATABASE;
+# 使用某个数据库
+USE coderhub;
+# 查看正在使用的数据库
+SELECT DATABASE();
+
+# 创建数据库
+CREATE DATABASE douyu;
+CREATE DATABASE IF NOT EXISTS douyu;
+# 创建数据库并指定字符集和编码格式
+CREATE DATABASE IF NOT EXISTS douyu DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+# 删除数据库
+DROP DATABASE IF EXISTS douyu;
+
+# 修改数据库编码
+ALTER DATABASE douyu CHARACTER SET = utf8 COLLATE = utf8_unicode_ci;
 ```
 
+对数据表 增删改
 
+```sql
+# 查看所有的表
+SHOW TABLES;
+
+# 创建表
+CREATE TABLE IF NOT EXISTS `students` (
+	`name` VARCHAR(10),
+	`age` INT,
+	`score` INT
+);
+
+# 删除表
+DROP TABLE IF EXISTS `students`;
+
+# 查看表结构
+DESC users;
+SHOW CREATE TABLE `users`;
+
+# 完整的创建一张表
+CREATE TABLE IF NOT EXISTS `users`(
+	`id` INT PRIMARY KEY AUTO_INCREMENT,
+	`name` VARCHAR(20) NOT NULL,
+	`age` INT DEFAULT 0,
+	`phoneNum` VARCHAR(20) UNIQUE DEFAULT '',
+	`createTime` TIMESTAMP
+);
+
+
+# 修改表
+# 1、修改表名字
+ALTER TABLE `users` RENAME TO `user`;
+# 2、添加一个新的字段
+ALTER TABLE `user` ADD `updateTime` TIMESTAMP;
+# 3、修改字段名字
+ALTER TABLE `user` CHANGE `phoneNum` `telPhone` VARCHAR(20);
+# 4、修改字段类型
+ALTER TABLE `user` MODIFY `name` VARCHAR(30);
+# 5、删除某一个字段
+-- ALTER TABLE `user` ADD `updatefsdfsdTime` TIMESTAMP;
+ALTER TABLE `user` DROP `updatefsdfsdTime`;
+
+
+# 补充
+# 根据一张表结构创建另一张表
+CREATE TABLE `user2` LIKE `user`;
+# 根据一张表中所有内容创建另一张表(仅内容，没有结构)
+CREATE TABLE `suer3` (SELECT * FROM `user`);
+```
+
+### DML
+
+对表增删改
+
+```sql
+```
 
 
 
