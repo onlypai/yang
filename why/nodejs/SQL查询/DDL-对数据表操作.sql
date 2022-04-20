@@ -37,6 +37,8 @@ ALTER TABLE `user` MODIFY `name` VARCHAR(30);
 # 5、删除某一个字段
 -- ALTER TABLE `user` ADD `updatefsdfsdTime` TIMESTAMP;
 ALTER TABLE `user` DROP `updatefsdfsdTime`;
+# 删除多个字段
+ALTER TABLE `user` DROP `updatefsdfsdTime`, DROP `asas`;
 
 
 # 补充

@@ -2822,6 +2822,162 @@ CREATE TABLE `suer3` (SELECT * FROM `user`);
 对表增删改
 
 ```sql
+# DML
+
+# 插入
+INSERT INTO user (name, telphone, age, createTime, updateTime) VALUES ('wangyang', 34, '43124235', '2020-10-23', '2022-02-23');
+
+# creatTime 和 updateTime 自动设置
+# 给这俩字段加上默认值
+ALTER TABLE `user` MODIFY createTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE `user` MODIFY updateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
+
+
+INSERT INTO user (name, age, telphone) VALUES ('tasang', 33, '4312244235');
+
+# 删除
+# 删除表中所有数据
+DELETE FROM `user`;
+# 根据条件删除    WHERE条件语句⭐
+DELETE FROM `user` WHERE `id`=2;
+
+# 更新
+# 一般是跟上条件来更新，不跟条件默认更新表中所有数据
+UPDATE `user` SET name='wangyang', telphone='6516516516' WHERE id=1; 
+```
+
+### DQL
+
+数据查询
+
+```sql
+SELECT
+    [ALL | DISTINCT | DISTINCTROW ]
+    [HIGH_PRIORITY]
+    [STRAIGHT_JOIN]
+    [SQL_SMALL_RESULT] [SQL_BIG_RESULT] [SQL_BUFFER_RESULT]
+    [SQL_NO_CACHE] [SQL_CALC_FOUND_ROWS]
+    select_expr [, select_expr] ...
+    [into_option]
+    [FROM table_references
+      [PARTITION partition_list]]
+    [WHERE where_condition]
+    [GROUP BY {col_name | expr | position}, ... [WITH ROLLUP]]
+    [HAVING where_condition]
+    [WINDOW window_name AS (window_spec)
+        [, window_name AS (window_spec)] ...]
+    [ORDER BY {col_name | expr | position}
+      [ASC | DESC], ... [WITH ROLLUP]]
+    [LIMIT {[offset,] row_count | row_count OFFSET offset}]
+    [into_option]
+    [FOR {UPDATE | SHARE}
+        [OF tbl_name [, tbl_name] ...]
+        [NOWAIT | SKIP LOCKED]
+      | LOCK IN SHARE MODE]
+    [into_option]
+
+into_option: {
+    INTO OUTFILE 'file_name'
+        [CHARACTER SET charset_name]
+        export_options
+  | INTO DUMPFILE 'file_name'
+  | INTO var_name [, var_name] ...
+```
+
+```sql
+# 创建球员表
+CREATE TABLE IF NOT EXISTS `players`(
+	`id` INT PRIMARY KEY AUTO_INCREMENT,
+	`displayNameEn` VARCHAR(30),
+	`displayName` VARCHAR(30),
+	`countryEn` VARCHAR(30),
+	`country` VARCHAR(30),
+	`draftYear` VARCHAR(10),
+	`height` DOUBLE,
+	`weight` VARCHAR(20),
+	`position` VARCHAR(20),
+	`playerId` INT,
+	`teamName` VARCHAR(20),
+	`teamCity` VARCHAR(20)
+);
+
+# 查询所有字段以及所有数据
+SELECT * FROM `players`;
+# 查询指定字段
+SELECT displayName, country FROM `players`;
+# 对字段结果起别名
+SELECT displayName as disName, country as disCt FROM `players`;
+```
+
+#### WHERE条件
+
+#### 模糊LIKE
+
+#### 排序ORDER BY
+
+#### 分页LIMIT OFFSET
+
+```sql
+#where查询条件
+
+# 1.简单条件运算符⭐：>、 <、 = 、!= 、<>(不等于)、 >=、 <=
+SELECT displayName, draftYear FROM `players` WHERE draftYear = 2011;
+
+# 2.逻辑运算符⭐
+/*
+	NOT 或 !   逻辑非
+	AND 或 &&  逻辑与   （BETWEEN ... AND ...关键字也可以，首尾包含等于）
+	OR  或 ||  逻辑或
+	XOR        逻辑异或
+*/
+# 与
+SELECT * FROM players WHERE draftYear > 2008 AND draftYear < 2016;
+SELECT * FROM players WHERE draftYear > 2008 && draftYear < 2016;
+SELECT * FROM players WHERE draftYear BETWEEN 2008 AND 2016;
+# 或
+SELECT * FROM players WHERE draftYear > 2018 OR country != '美国';
+
+# 值为NULL的  IS NULL⭐   IS NOT NULL
+-- UPDATE players SET country = NULL WHERE displayName = '克里斯 保罗';
+SELECT * FROM players WHERE country IS NULL;
+
+# 3.模糊查询 LIKE ⭐
+/*
+	% 匹配0个或多个的任意字符
+	_ 匹配一个的任意字符
+*/
+SELECT * FROM players WHERE position LIKE '_卫'; # 第二个字符为'卫'的
+SELECT * FROM players WHERE teamName LIKE '__狼'; # 第三个字符为'狼'的
+SELECT * FROM players WHERE teamName LIKE '%林%';# 带有'林'的
+
+# 4.IN 取多个值中的一个，可以使用 逻辑或 代替
+SELECT * FROM players WHERE position IN ('后卫', '前锋', '中锋');
+
+
+
+
+
+# 结果排序 ORDER BY⭐
+/*
+	ASC  升序
+	DESC 降序
+*/
+# 先根据选秀年份升序，年份相同的根据身高降序
+SELECT * FROM players WHERE position IN ('后卫', '前锋', '中锋') ORDER BY draftYear ASC, height DESC;
+
+
+
+
+
+
+# 分页查询⭐
+/*
+	OFFSET偏移量  LIMIT条数
+ 方式1.LIMIT limitNum OFFSET offsetNum
+ 方式2.LIMIT offsetNum, limitNum
+*/
+SELECT * FROM players LIMIT 10 OFFSET 20;
+SELECT * FROM players LIMIT 20, 10;
 ```
 
 
