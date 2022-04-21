@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS `players`(
 SELECT * FROM `players`;
 # 查询指定字段
 SELECT displayName, country FROM `players`;
-# 对字段结果起别名
+# 对字段结果起别名  （as可以省略不写）
 SELECT displayName as disName, country as disCt FROM `players`;
 
 
