@@ -2737,7 +2737,7 @@ mysql> show databases;
 
 ![image-20220418102356072](index.assets/image-20220418102356072.png) 
 
-![image-20220418102634777](index.assets/image-20220418102634777.png)默认就是`NOT NULL` 
+![image-20220418102634777](index.assets/image-20220418102634777.png)`主键`默认就是`NOT NULL` 
 
 
 
@@ -3164,7 +3164,256 @@ UNION
 
 > SQL规范中全连接是使用`FULL JOIN`，但是MySQL中没有对它的支持，需要使用`UNION`
 
+#### 多对多关系⭐
 
+案例：学生选课情况，一个学生可以选择多门课程，一个课程也可以被多名学生选择
+
+多对多关系设计
+
+![image-20220425111149569](index.assets/image-20220425111149569.png) 
+
+```sql
+# 创建学生表
+CREATE TABLE IF NOT EXISTS students (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(10) NOT NULL,
+	age INT
+);
+
+# 创建课程表
+CREATE TABLE IF NOT EXISTS courses (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	name VARCHAR(10) NOT NULL,
+	price DOUBLE
+);
+# 插入数据
+INSERT into students (name, age) VALUES('wang', 18);
+INSERT into students (name, age) VALUES('tom', 45);
+INSERT into students (name, age) VALUES('lily', 25);
+INSERT into students (name, age) VALUES('rong', 18);
+INSERT into students (name, age) VALUES('yang', 20);
+
+INSERT into courses (name, price) VALUES('篮球', 500);
+INSERT into courses (name, price) VALUES('羽毛球', 20);
+INSERT into courses (name, price) VALUES('游泳', 203);
+INSERT into courses (name, price) VALUES('乒乓球', 20);
+INSERT into courses (name, price) VALUES('足球', 10);
+
+# 创建关系表
+CREATE TABLE IF NOT EXISTS students_select_courses (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	student_id INT NOT NULL,
+	course_id INT NOT NULL,
+	-- PRIMARY KEY(student_id, course_id),联合主键
+	FOREIGN KEY (student_id) REFERENCES students(id) ON UPDATE CASCADE,
+	FOREIGN KEY (course_id) REFERENCES courses(id) ON UPDATE CASCADE
+);
+
+
+# 学生选课
+INSERT INTO students_select_courses (student_id, course_id) VALUES (1, 1);
+INSERT INTO students_select_courses (student_id, course_id) VALUES (1, 2);
+INSERT INTO students_select_courses (student_id, course_id) VALUES (1, 3);
+INSERT INTO students_select_courses (student_id, course_id) VALUES (2, 4);
+INSERT INTO students_select_courses (student_id, course_id) VALUES (3, 1);
+INSERT INTO students_select_courses (student_id, course_id) VALUES (3, 2);
+INSERT INTO students_select_courses (student_id, course_id) VALUES (4, 4);
+
+```
+
+多对多查询
+
+```sql
+# 查询所有进行了选课的学生，以及对应的课程（两个内连接）
+SELECT a.id, a.name stuName, a.age stuAge, c.id cId, c.name cName, c.price cPrice
+FROM students a
+JOIN students_select_courses b ON a.id = b.student_id
+JOIN courses c ON b.course_id = c.id; 
+
+# 查询所有学生的选课情况（左连接）
+SELECT a.id, a.name stuName, a.age stuAge, c.id cId, c.name cName, c.price cPrice
+FROM students a
+LEFT JOIN students_select_courses b ON a.id = b.student_id
+LEFT JOIN courses c ON b.course_id = c.id;
+
+# 查询所有没有选课的学生（在上面基础上挑出）
+SELECT a.id, a.name stuName, a.age stuAge, c.id cId, c.name cName, c.price cPrice
+FROM students a
+LEFT JOIN students_select_courses b ON a.id = b.student_id
+LEFT JOIN courses c ON b.course_id = c.id
+WHERE c.id IS NULL;
+
+# 查询所有没有被选择的课程
+SELECT a.id, a.name stuName, a.age stuAge, c.id cId, c.name cName, c.price cPrice
+FROM students a
+RIGHT JOIN students_select_courses b ON a.id = b.student_id
+RIGHT JOIN courses c ON b.course_id = c.id
+WHERE a.id IS NULL;
+
+# 查询某一个学生的选课情况
+SELECT a.id, a.name stuName, a.age stuAge, c.id cId, c.name cName, c.price cPrice
+FROM students a
+LEFT JOIN students_select_courses b ON a.id = b.student_id
+LEFT JOIN courses c ON b.course_id = c.id
+WHERE a.id = 1;
+```
+
+### 查询数据的问题JSON_OBJECT
+
+对象 `JSON_OBJECT('id',b.id, 'name', b.teamName, 'city', b.teamCity)`
+
+数组 `JSON_ARRAYAGG(JSON_OBJECT('id',c.id, 'name',c.name,'price', c.price))`
+
+```sql
+# 将联合查询到的数据转成 对象 （一对多）
+SELECT 
+a.id, a.displayName, 
+JSON_OBJECT('id',b.id, 'name', b.teamName, 'city', b.teamCity) teams 
+FROM players a 
+LEFT OUTER JOIN teams b ON a.teamName_id = b.id;
+
+#将查询到的多条数据组织成对象，放入一个 数组 中（多对多） 需要分组
+# 查询所有进行了选课的学生，以及对应的课程
+# 根据id分组，那么a.name, a.age也可以查出
+SELECT a.id, a.name, a.age, JSON_ARRAYAGG(JSON_OBJECT('id',c.id, 'name',c.name,'price', c.price))
+FROM students a
+JOIN students_select_courses b ON a.id = b.student_id
+JOIN courses c ON b.course_id = c.id
+GROUP BY a.id; 
+```
+
+## node中连接mysql
+
+![image-20220425163920606](index.assets/image-20220425163920606.png) 
+
+### 基本使用
+
+`mysql.createConnection`
+
+```js
+const mysql = require("mysql2")
+//1、建立数据库连接
+const connection = mysql.createConnection({
+  host: "localhost",
+  port: 3306, //default 3306
+  database: "sqlDemo",
+  user: "root",
+  password: "000000",
+})
+
+//2、执行sql语句
+const statement = `SELECT * FROM players WHERE draftYear > ? AND draftYear < ?;`
+
+connection.query(statement, [2008, 2016], (err, results, fields) => {
+  console.log(err) //错误：执行正确就为null
+  console.log(results) //结果
+  console.log(fields)
+})
+```
+
+### 预编译(预处理)语句⭐
+
+`connection.execute`
+
+```js
+const mysql = require("mysql2")
+//1、建立数据库连接
+const connection = mysql.createConnection({
+  host: "localhost",
+  port: 3306,
+  database: "sqlDemo",
+  user: "root",
+  password: "000000",
+})
+
+//预编译语句(先调用prepare，在调用query⭐)
+//1.会先查询这一句，但是没加参数
+const statement = `SELECT * FROM players WHERE draftYear > ? AND draftYear < ?;`
+
+//2.传入参数的时候直接在之前查询到的基础之上查询，性能更高
+connection.execute(statement, [2008, 2016], (err, results) => {
+  console.log(results)
+})
+```
+
+### 连接池
+
+![image-20220425165204488](index.assets/image-20220425165204488.png) 
+
+`mysql.createPool`
+
+```js
+const mysql = require('mysql2')
+    //1、建立数据库连接池
+const connection = mysql.createPool({
+    host: 'localhost',
+    port: 3306,
+    database: 'myemployees',
+    user: 'root',
+    password: '99699',
+    connectionLimit: 10 //最大连接个数
+})
+
+//2、执行sql语句
+const statement = `SELECT employee_id,salary,first_name FROM employees WHERE salary>=? AND salary<=?;`;
+
+connection.promise().execute(statement, [10000, 12000]).then(([results, fields]) => {
+    console.log(results); //拿到的结果是包含results和fields，[results,fields]是对结果做一个解构
+}).catch((err) => {
+    console.log(err);
+})
+```
+
+### promise方式
+
+```js
+const mysql = require("mysql2")
+const connection = mysql.createPool({
+  host: "localhost",
+  port: 3306,
+  database: "sqlDemo",
+  user: "root",
+  password: "000000",
+  connectionLimit: 10,
+})
+
+const statement = `SELECT * FROM players WHERE draftYear > ? AND draftYear < ?;`
+
+connection
+  .promise()
+  .execute(statement, [2008, 2016])
+  .then(([results, fields]) => {
+    console.log(results) //拿到的结果是包含results和fields，[results,fields]是对结果做一个解构
+  })
+  .catch((err) => {
+    console.log(err)
+  })
+```
+
+### async await方式
+
+```js
+const mysql = require("mysql2")
+//1、建立数据库连接池
+const connection = mysql.createPool({
+  host: "localhost",
+  port: 3306,
+  database: "sqlDemo",
+  user: "root",
+  password: "Wangyang888.",
+  connectionLimit: 10, //最大连接个数
+})
+
+//2、执行sql语句
+
+const statement = `SELECT * FROM players WHERE draftYear > ? AND draftYear < ?;`
+async function init() {
+  //函数内使用
+  const results = await connection.promise().execute(statement, [2008, 2016])
+  console.log(results)
+}
+init()
+```
 
 
 
