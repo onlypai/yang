@@ -3415,6 +3415,80 @@ async function init() {
 init()
 ```
 
+### 检查是否连接成功
+
+`getConnection`
+
+```js
+const mysql = require("mysql2")
+const { MYSQL_HOST, MYSQL_PORT, MYSQL_USER, MYSQL_DATABASE, MYSQL_PASSWORD } = require("./config")
+
+const pool = mysql.createPool({
+  host: MYSQL_HOST,
+  port: MYSQL_PORT,
+  database: MYSQL_DATABASE,
+  password: MYSQL_PASSWORD,
+  user: MYSQL_USER,
+})
+
+pool.getConnection((err, conn) => {
+  console.log(conn)
+  conn.connect((err) => {
+    if (err) {
+      console.log("数据库连接失败：", err)
+      return
+    }
+    console.log("数据库连接成功")
+  })
+})
+module.exports = pool.promise()
+```
+
+### ORM
+
+将一张表映射到一个类里面，通过这个类来操作数据库而并非使用sql语句
+
+
+
+## coderhub
+
+### 环境变量
+
+```shell
+npm i dotenv
+```
+
+根目录下创建`.env`文件
+
+```
+APP_PORT=8000
+APP_HOST=http://localhost
+```
+
+```js
+const dotenv = require("dotenv")
+//调用config()
+dotenv.config()
+
+//变量会自动加入到`process.env`对象中
+module.exports = {
+  APP_PORT,
+  APP_HOST
+} = process.env
+```
+
+### [crypto加密](http://nodejs.cn/api/crypto.html)
+
+```js
+const crypto = require("crypto") //nodejs内置的库
+
+const md5Password = (password) => {
+  const md5 = crypto.createHash("md5")
+  return md5.update(password).digest("hex")
+}
+module.exports = md5Password
+```
+
 
 
 
