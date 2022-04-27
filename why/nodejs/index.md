@@ -3489,11 +3489,174 @@ const md5Password = (password) => {
 module.exports = md5Password
 ```
 
+### 登陆凭证
+
+#### cookie
+
+```js
+const Koa = require("koa")
+const Router = require("koa-router")
+const app = new Koa()
+const router = new Router()
+
+//cookie可以在客户端、服务端设置⭐
+router.get("/login", (ctx, next) => {
+  //设置cookie
+  ctx.cookies.set("name", "aaa", {
+    maxAge: 50 * 1000,
+  })
+  ctx.body = "test"
+})
+
+router.get("/demo", (ctx) => {
+  //读取 cookie
+  //先调用了login接口设置了cookie，之后调用别的接口会在请求头中自动加上cookie，不需要手动传递，所以这里直接读取
+  const value = ctx.cookies.get("name")
+  ctx.body = "你的cookies是" + value
+})
+
+app.use(router.routes())
+app.use(router.allowedMethods())
+app.listen(5000, () => {
+  console.log("4000端口已经启动")
+})
+```
+
+#### session
+
+```js
+const Koa = require("koa")
+const Router = require("koa-router")
+const app = new Koa()
+const Session = require("koa-session")
+
+const router = new Router()
+
+//创建session配置
+const session = Session(
+  {
+    key: "sessionId",
+    maxAge: 100 * 1000,
+    signed: true, //默认true，是否使用加密签名,使用之后客户端会生成sessionId和sessionId.sig
+  },
+  app
+)
+app.keys = ["独特的签名aaaaa防止客户端篡改"]
+app.use(session)
+
+//session不可以在客户端设置，只能在服务端设置⭐
+router.get("/login", (ctx, next) => {
+  //设置session
+  const id = 10
+  const name = "wangy"
+  ctx.session.user = { id, name }
+  ctx.body = "test"
+})
+
+router.get("/demo", (ctx) => {
+  //读取 session
+  //先调用了login接口设置了session，sessionId会储存在cookie中，之后调用别的接口会在请求头中自动加上sessionId
+  //sessionId就是用户信息使用base64转成的一个字符串
+  console.log(ctx.session.user)
+  ctx.body = "你"
+})
+
+app.use(router.routes())
+app.use(router.allowedMethods())
+app.listen(5000, () => {
+  console.log("4000端口已经启动")
+})
+```
+
+![image-20220427103151194](index.assets/image-20220427103151194.png) 
+
+最后两个缺点是重点⭐
+
+#### token
+
+![image-20220427130809769](index.assets/image-20220427130809769.png) 
+
+JWT实现Token机制
+
+![image-20220427131915453](index.assets/image-20220427131915453.png) 
+
+```shell
+npm i jsonwebtoken
+```
+
+```js
+const Koa = require("koa") //安装
+const Router = require("koa-router") //安装
+const fs = require("fs")
+const jwt = require("jsonwebtoken") //安装
+
+const app = new Koa()
+const loginRouter = new Router()
+
+const PRIVATE_KEY = fs.readFileSync("./keys/private.key") //相对路径读取
+const PUBLIC_KEY = fs.readFileSync("./keys/public.key")
+
+//使用非对称加密，加密使用PRIVATE_KEY，解密使用PUBLIC_KEY
+
+//登录  颁发token
+loginRouter.get("/login", (ctx, next) => {
+  const user = { id: 23, name: "wang" }
+  //传入payload
+  const token = jwt.sign(user, PRIVATE_KEY, {
+    //签发时间无需设置
+    //过期时间
+    expiresIn: 3600 * 24, //s
+    algorithm: "RS256", //非对称加密指定算法⭐
+  })
+  ctx.body = token //登录时将token作为响应数据返回
+})
+
+//验证token
+loginRouter.get("/demo", (ctx, next) => {
+  const authorization = ctx.headers.authorization //将token保存在这里传过来进行验证
+  const token = authorization.replace("Bearer ", "") //拿到token
+  try {
+    //jwt.verify验证失败会直接抛出异常
+    const result = jwt.verify(token, PUBLIC_KEY, {
+      algorithms: ["RS256"], //非对称加密解密指定算法⭐   //algorithms有s是一个数组：可以采用多种算法验证
+    })
+    ctx.body = result //用户信息
+  } catch (error) {
+    ctx.body = "token无效，登陆失败"
+  }
+})
+app.use(loginRouter.routes())
+app.use(loginRouter.allowedMethods())
+app.listen(8000, () => {
+  console.log("8000端口启动成功")
+})
+```
+
+##### token的非对称加密
+
+使用`openssl`生成公玥和私玥
+
+* mac操作系统：终端自带此工具
+* windows系统：
+  * cmd中无法使用（如果想使用，先安装openssl，再添加环境变量）
+  * `git-bash`中自带，可以直接使用
+
+```shell
+# 文件夹下打开git bash终端
+openssl                                         # 进入openssl命令界面
+genrsa -out private.key 1024                    # 生成私钥并导出，大小1024字节（可以改）
+rsa -in private.key -pubout -out public.key     # 根据私钥生成公钥并导出
+```
+
+![image-20220427135851661](index.assets/image-20220427135851661.png) 
 
 
 
-
-
+> 项目中使用`相对路径`都是相对于`process.cwd()`(Node.js 进程的当前工作目录)⭐
+>
+> 所以在项目中使用相对路径寻找密钥可能会找不到
+>
+> 使用绝对路径`path.resolve(__dirname, "./keys/public.key")`
 
 
 
