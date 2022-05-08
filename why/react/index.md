@@ -40,7 +40,7 @@
     ></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
-    <!-- 默认不能在script中使用jsx，如果使用就是想，并且希望代码被解析，必须在script标签上加上 type="text/babel" 属性⭐ -->
+    <!-- 默认不能在script中使用jsx，如果想使用，并且希望代码被解析，必须在script标签上加上 type="text/babel" ⭐ -->
     <!-- jsx特点：根元素只能有一个标签 -->
     <!-- 点击执行handleClick方法，会将message改变，但视图不会立即更新，需要重新渲染jsx⭐ -->
     <script type="text/babel">
