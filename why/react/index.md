@@ -108,5 +108,88 @@
   </body>
 ```
 
+## react语法
 
+### JSX
+
+jsx语法只有在`引入babel`和script标签上有`type="text/babel"`属性的时候才可以使用，直接在script中使用就是错误的语法
+
+```jsx
+const com = <h4>hello world</h4>
+```
+
+![image-20220509214845697](index.assets/image-20220509214845697.png) 
+
+为什么react选择jsx：`all in js`设计哲学
+
+jsx书写规范：
+
+* 顶层只能有一个根标签
+* 通常在jsx外层包裹一个小括号，便于阅读、换行书写
+* jsx中标签可以是单标签，也可以是双标签，但是单标签一定要以`/>`结尾
+
+ #### jsx注释
+
+```jsx
+{/*这是jsx的注释*/}
+```
+
+#### jsx嵌入数据
+
+* 可以展示的Number、String、Array
+* 不能正常展示null，undefined、布尔值，要转化成`字符串`
+* 对象类型不能作为jsx子元素
+
+```js
+    <script type="text/babel">
+      class App extends React.Component {
+        constructor() {
+          super()
+          this.state = {
+            //{}中可以展示的Number、String、Array
+            num: 1,
+            str: 'haha',
+            arr: ['das', 'fgsd', 'gd'],
+
+            //{}中不能正常展示的（忽略）
+            nu: null,
+            unde: undefined,
+            boo: true,
+
+            //对象类型不能作为jsx子元素
+            obj: {
+              aaa: 'fasfs',
+            },
+          }
+        }
+        render() {
+          return (
+            <div>
+              <h4>{this.state.num}</h4>
+              <h4>{this.state.str}</h4>
+              <h4>{this.state.arr}</h4>
+
+              <h4>{String(this.state.nu)}</h4>
+              <h4>{String(this.state.unde)}</h4>
+              <h4>{this.state.boo.toString()}</h4>
+              <h4>{this.state.boo + ''}</h4>
+
+              {/*<h4>{this.state.obj}</h4>*/}
+            </div>
+          )
+        }
+      }
+      ReactDOM.render(<App />, document.getElementById('app'))
+    </script>
+```
+
+#### jsx嵌入表达式
+
+```jsx
+{/*表达式*/}
+<h4>{this.state.num + this.state.str}</h4>
+<h4>{20 * 90}</h4>
+<h4>{this.state.num === 1 ? '发射' : '哈哈'}</h4>
+<h4>{this.add()}</h4>
+```
 
