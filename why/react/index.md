@@ -193,3 +193,62 @@ jsx书写规范：
 <h4>{this.add()}</h4>
 ```
 
+#### jsx绑定元素的属性
+
+* `className={'box wrap ' + (isActive ? 'active' : '')}`
+* `style={{key: value,}}`
+
+> jsx里面不能存在js关键字，像class属性，for属性都是关键字⭐，class用className代替，for用htmlFor代替
+
+```jsx
+    <script type="text/babel">
+      class App extends React.Component {
+        constructor() {
+          super()
+          this.state = {
+            title: 'hahah',
+            src: 'http://p4.music.126.net/sjyk0uNtgH9-ZCM6djXR5g==/109951167039788611.jpg?param=200y200',
+            hrefs: 'http://www.baidu.com',
+            isActive: true,
+            fontSize: '14px',
+          }
+        }
+        render() {
+          const { title, src, hrefs, isActive, fontSize } = this.state
+          function formatSrc(e) {
+            return e
+          }
+          return (
+            <div>
+              {/*绑定普通属性*/}
+              <h4 title={title}>标题</h4>
+              <img src={src} alt="" />
+              <img src={formatSrc(src)} alt="" />
+              <a href={hrefs} target="_blank">
+                百度
+              </a>
+              {/*动态绑定class属性*/}
+              {/*jsx里面不能存在js关键字，像class属性，for属性都是关键字⭐，class用className代替，for用htmlFor代替*/}
+              <div className={'box wrap ' + (isActive ? 'active' : '')}>
+                动态绑定class
+              </div>
+              <label htmlFor="aaa"></label>
+
+              {/*动态绑定style属性⭐*/}
+              {/*里面的{}是对象，style属性以键值对的形式存在*/}
+              <div style={{ color: 'red', fontSize: fontSize }}>
+                动态绑定style
+              </div>
+            </div>
+          )
+        }
+      }
+      ReactDOM.render(<App />, document.getElementById('app'))
+    </script>
+```
+
+#### jsx绑定事件
+
+```jsx
+```
+
