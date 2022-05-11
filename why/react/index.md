@@ -108,7 +108,7 @@
   </body>
 ```
 
-## react语法
+## react核心概念
 
 ### JSX
 
@@ -249,6 +249,150 @@ jsx书写规范：
 
 #### jsx绑定事件
 
+事件使用`小驼峰式`，而不是原生的`小写方式`
+
+this绑定有三种方式
+
 ```jsx
+    <script type="text/babel">
+      class App extends React.Component {
+        constructor() {
+          super()
+          this.state = {
+            title: 'hahah',
+          }
+          this.handleClick1 = this.handleClick1.bind(this) //方式一：this显示绑定
+        }
+        render() {
+          return (
+            <div>
+              <button onClick={this.handleClick1}>提交</button>
+              <button onClick={this.handleClick2}>提交</button>
+              {/*方式三：箭头函数中调用需要执行的函数⭐(推荐使用)*/}
+              <button
+                onClick={() => {
+                  this.handleClick3()
+                }}
+              >
+                提交
+              </button>
+            </div>
+          )
+        }
+        handleClick1() {
+          console.log('handleClick1')
+        }
+        //ES6中给对象增加属性的语法，class fields⭐
+        handleClick2 = () => {
+          console.log('handleClick2')
+        } //方式二：箭头函数
+        handleClick3() {
+          console.log('handleClick3')
+        }
+      }
+      ReactDOM.render(<App />, document.getElementById('app'))
+    </script>
 ```
+
+事件绑定传递参数
+
+```jsx
+    <script type="text/babel">
+      class App extends React.Component {
+        constructor() {
+          super()
+          this.state = {
+            title: 'hahah',
+          }
+          this.handleClick1 = this.handleClick1.bind(this)
+        }
+        render() {
+          return (
+            <div>
+              <button onClick={this.handleClick1}>提交</button>
+              <button onClick={this.handleClick2}>提交</button>
+              {/*event事件对象是在箭头函数上的，搞清楚⭐ */}
+              <button
+                onClick={(event) => {
+                  this.handleClick3('参数一', event)
+                }}
+              >
+                提交
+              </button>
+            </div>
+          )
+        }
+        handleClick1(event) {
+          console.log(event) //这个事件对象是react内部合成的事件对象，而不是浏览器的那个事件对象⭐
+        }
+        handleClick2 = () => {
+          console.log('handleClick2')
+        } //方式二：箭头函数
+        handleClick3(aaa, event) {
+          console.log(aaa, event)
+        }
+      }
+      ReactDOM.render(<App />, document.getElementById('app'))
+    </script>
+```
+
+### 元素(条件)渲染
+
+v-if的效果：
+
+* if条件语句
+* 三元运算符
+* 逻辑与 `&&`
+
+> 注意：jsx中 布尔值 不显示，所以 逻辑与 前面为否的话就返回前面的，也就是什么都不显示，但是`0`也表示否，如果前面的值是0的话，显示的内容就是数字`0`
+
+```jsx
+    <script type="text/babel">
+      class App extends React.Component {
+        constructor() {
+          super()
+          this.state = {
+            isLogin: true,
+            zero: 0,
+          }
+        }
+        render() {
+          //方式一：if条件判断语句
+          let welcome = null
+          if (this.state.isLogin) {
+            welcome = <h4>欢迎回来</h4>
+          } else {
+            welcome = <h4>滚</h4>
+          }
+          return (
+            <div>
+              {welcome}
+              <button
+                onClick={() => {
+                  this.setState({ isLogin: !this.state.isLogin })
+                }}
+              >
+                {/*方式二：三元运算符*/}
+                {!this.state.isLogin ? '登录' : '退出'}
+              </button>
+              {/*方式三：逻辑与：数字0表示否，但是会显示0⭐*/}
+              <h4>{this.state.isLogin && '你终于登陆了'}</h4>
+              <h4>{this.state.zero && 'zzz'}</h4>
+            </div>
+          )
+        }
+      }
+      ReactDOM.render(<App />, document.getElementById('app'))
+    </script>
+```
+
+v-show的效果（元素一直存在，不显示就修改display为none）：
+
+```jsx
+<div style={{ display: this.state.isLogin ? 'block' : 'none' }}>
+    你终于登陆了
+</div>
+```
+
+### 列表渲染
 
