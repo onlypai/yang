@@ -336,6 +336,29 @@ this绑定有三种方式
     </script>
 ```
 
+#### jsx本质
+
+实际上，jsx仅仅是`React.createElement(component,props,...children)`函数的语法糖
+
+所有的jsx最终都会被转换成`React.createElement`函数调用
+
+![image-20220512103715421](index.assets/image-20220512103715421.png) 
+
+```js
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="text/babel">
+      const mas1 = <h4>jsxxx</h4>
+      const mas2 = React.createElement("h4", null, "jsxxx") //不使用jsx也就不需要babel
+      ReactDOM.render(mas1, document.getElementById("app"))
+    </script>
+```
+
+![image-20220512104552642](index.assets/image-20220512104552642.png) 
+
+[jsx -> React.createElement](https://babeljs.io/repl)
+
 ### 元素(条件)渲染
 
 v-if的效果：
@@ -394,5 +417,4 @@ v-show的效果（元素一直存在，不显示就修改display为none）：
 </div>
 ```
 
-### 列表渲染
-
+### 列表渲染 
