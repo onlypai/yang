@@ -340,24 +340,63 @@ this绑定有三种方式
 
 实际上，jsx仅仅是`React.createElement(component,props,...children)`函数的语法糖
 
-所有的jsx最终都会被转换成`React.createElement`函数调用
+①所有的jsx最终都会被转换成`React.createElement`函数调用
 
 ![image-20220512103715421](index.assets/image-20220512103715421.png) 
 
 ```js
+  <body>
+    <div id="app"></div>
     <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script type="text/babel">
-      const mas1 = <h4>jsxxx</h4>
-      const mas2 = React.createElement("h4", null, "jsxxx") //不使用jsx也就不需要babel
-      ReactDOM.render(mas1, document.getElementById("app"))
+      // const msg1 = <h4>jsxxx</h4>
+      const msg1 = (
+        <div className="wrap">
+          <div className="top">
+            <h4>554454</h4>
+          </div>
+          <div className="middle">
+            <div>zhongjian</div>
+          </div>
+          <div className="footer">jiao</div>
+        </div>
+      )
+      const msg2 = React.createElement("h4", null, "jsxxx") //不使用jsx也就不需要babel，①jsx其实就是转成React.createElement函数调用
+      console.log(msg1) //②返回ReactElement对象
+      console.log(msg2) //②返回ReactElement对象
+      ReactDOM.render(msg1, document.getElementById("app")) //③虚拟DOM转化成真实的DOM并塞进根元素
     </script>
+  </body>
 ```
 
 ![image-20220512104552642](index.assets/image-20220512104552642.png) 
 
 [jsx -> React.createElement](https://babeljs.io/repl)
+
+②执行React.createElement()会返回一个`ReactElement`对象（其实是一个对象树，就是大名鼎鼎的`虚拟DOM`）
+
+可以打印这个对象看结构
+
+![image-20220513153656809](index.assets/image-20220513153656809.png) 
+
+③`ReactDOM.render(<App/>,document.getElementById("app"))`方法将虚拟DOM与真实的DOM同步（映射）起来，这个过程叫做`协调（Reconciliation）`
+
+> WEB开发中的流程：jsx -> React.createElement() -> ReactElement对象 -> 经过ReactDOM.render -> 真实的DOM
+>
+> react-navite中的流程：jsx -> React.createElement() -> ReactElement对象 -> 经过ReactDOM.render -> 原生的（移动端）控件
+
+![image-20220513154241155](index.assets/image-20220513154241155.png) 
+
+##### 疑问：为什么使用虚拟DOM
+
+* 原有的开发模式很难跟踪`状态(数据)`发生的改变，我们可以直接调式虚拟DOM里面的数据，使用react调式工具
+* 操作真实的DOM`性能较低`：传统开发模式会进行频繁的DOM操作，而这一做法性能较低，DOM操作会引起`浏览器的重绘和回流`，所以在开发中应避免频繁的DOM操作
+
+##### 声明式编程
+
+![image-20220513155534451](index.assets/image-20220513155534451.png) 
 
 ### 元素(条件)渲染
 
@@ -418,3 +457,4 @@ v-show的效果（元素一直存在，不显示就修改display为none）：
 ```
 
 ### 列表渲染 
+
