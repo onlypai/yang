@@ -103,6 +103,7 @@
           })
         }
       }
+      //React中组件名称必须以大写字母开头。⭐ React 会将以小写字母开头的组件视为原生 DOM 标签。
       ReactDOM.render(<App />, document.getElementById('app'))
     </script>
   </body>
@@ -458,3 +459,120 @@ v-show的效果（元素一直存在，不显示就修改display为none）：
 
 ### 列表渲染 
 
+* 数组高阶函数`map、filter...`
+* `key`值设定
+
+```jsx
+  <body>
+    <div id="app"></div>
+    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script type="text/babel">
+      class App extends React.Component {
+        constructor() {
+          super()
+          this.state = {
+            movies: ['黄飞鸿', '狼牙', '摔跤吧爸爸', '变形金刚', '大话西游'],
+            numbers: [100, 209, 20, 1209, 342, 3, 50, 2, 321, 212],
+          }
+        }
+        render() {
+          return (
+            <div>
+              <h4>名字列表</h4>
+              <ul>
+                {this.state.movies.map((e) => (
+                  <li key={e}>{e}</li>
+                ))}
+              </ul>
+              <h4>大于等于50的列表</h4>
+              <ul>
+                {this.state.numbers
+                  .filter((e) => e >= 50)
+                  .map((e) => (
+                    <li key={e.toString()}>{e}</li>
+                  ))}
+              </ul>
+
+              <h4>前4个元素的列表</h4>
+              <ul>
+                {this.state.numbers.slice(0, 4).map((e) => (
+                  <li key={e.toString()}>{e}</li>
+                ))}
+              </ul>
+            </div>
+          )
+        }
+      }
+      ReactDOM.render(<App />, document.getElementById('app'))
+    </script>
+  </body>
+```
+
+* key 帮助 React 识别哪些元素改变了，比如被添加或删除。因此你应当给数组中的每一个元素赋予一个确定的标识。
+
+* 一个元素的 key 最好是这个元素在列表中拥有的一个`独一无二的字符串`。
+
+* 当元素没有确定 id 的时候，`万不得已你可以使用元素索引 index 作为 key`
+* 如果你选择`不指定显式的 key 值`，那么 React 将`默认使用索引`用作为列表项目的 key 值。
+* key 值在兄弟节点之间必须唯一，当我们生成两个不同的数组时，我们可以使用相同的 key 值，见上面的例子
+
+* 用 key 提取组件
+
+元素的 key 只有放在就近的数组上下文中才有意义。一个好的经验法则是：在 `map()` 方法中的元素需要设置 key 属性。
+
+```jsx
+function ListItem(props) {
+  // 正确！这里不需要指定 key：
+  return <li>{props.value}</li>;
+}
+
+function NumberList(props) {
+  const numbers = props.numbers;
+  const listItems = numbers.map((number) =>
+    // 正确！key 应该在数组的上下文中被指定
+    <ListItem key={number.toString()} value={number} />
+  );
+  return (
+    <ul>
+      {listItems}
+    </ul>
+  );
+}
+```
+
+
+
+## React脚手架`create-react-app`
+
+前端三大脚手架都是使用node编写的，并且都是基于webpack，所以电脑上需要安装`node环境`
+
+```shell
+# 安装react脚手架工具
+npm i -g create-react-app
+
+# 创建项目
+# 项目名字不允许使用大写字母⭐
+create-react-app name
+```
+
+![image-20220516144522050](index.assets/image-20220516144522050.png) 
+
+### PWA-渐进式WEB应用
+
+![image-20220516145337395](index.assets/image-20220516145337395.png) 
+
+> 如果你的应用程序没有PWA功能，那么可以将相关文件全部删除
+
+### 脚手架中的webpack
+
+和`vue-cli3`脚手架一样，react脚手架将有关微博pack的配置信息都隐藏起来了
+
+如果想查看webpack相关配置信息，运行`npm run eject`命令，前提是你的本地代码需要全部提交（本地无修改）
+
+![image-20220516152422723](index.assets/image-20220516152422723.png) 
+
+![image-20220516152817559](index.assets/image-20220516152817559.png) 
+
+多出的两个文件夹就是配置信息，并且`package.json`文件中之前隐藏的依赖增加了很多
