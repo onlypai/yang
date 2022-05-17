@@ -601,7 +601,9 @@ create-react-app name
 
 ![image-20220517092338090](index.assets/image-20220517092338090.png) 
 
-#### 类组件
+#### 类组件和函数组件
+
+类组件
 
 * 组件名是`大写字符`开头（无论是类组件还是函数组件）
 * 类组件需要继承自`React.Component`
@@ -615,7 +617,7 @@ create-react-app name
 * this.state中维护的就是我们组件内部的数据
 * render()方法是class中唯一必须实现的方法
 
-#### 函数组件
+函数组件
 
 * 没有this对象
 
@@ -643,7 +645,7 @@ create-react-app name
   }
 ```
 
-### 生命周期
+#### 组件生命周期
 
 ![image-20220517104219297](index.assets/image-20220517104219297.png) 
 
@@ -665,6 +667,15 @@ create-react-app name
 
 ![image-20220517110514183](index.assets/image-20220517110514183.png) 
 
+componentDidUpdate有三个参数
+
+```js
+componentDidUpdate(prevProps, prevState, snapshot) {
+    console.log(prevProps, prevState, snapshot)//更新之前的props和state数据，第三个参数是getSnapshotBeforeUpdate() 生命周期的返回值，没有即为undefined
+    console.log('componentDidUpdate')
+  }
+```
+
 * componentWillUnmount
 
 ![image-20220517110549987](index.assets/image-20220517110549987.png) 
@@ -684,3 +695,100 @@ create-react-app name
 * getSnapshotBeforeUpdate
 
 `getSnapshotBeforeUpdate()` 在最近一次渲染输出（提交到 DOM 节点）之前调用（数据更新之前调用）。
+
+#### 组件的嵌套
+
+#### 组件通信
+
+##### 父传子
+
+* 传入的属性保存在props对象中
+* propTypes定义验证
+* defaultProps定义默认值
+
+* 使用`prop-types库`对props属性进行验证，[查看所有验证器](https://zh-hans.reactjs.org/docs/typechecking-with-proptypes.html)
+
+```js
+import React, { Component } from 'react'
+import PropTypes from 'prop-types' //自React15起抽出为单独库
+
+//类子组件
+class Child extends Component {
+  //属性验证
+  static propTypes = {
+    name: PropTypes.string.isRequired,
+    age: PropTypes.number,
+    list: PropTypes.array,
+  }
+  //属性默认值
+  static defaultProps = {
+    name: 'Child',
+    age: 12,
+    list: [21, 342, 55],
+  }
+  render() {
+    const { name, age, list } = this.props
+    return (
+      <div>
+        类子组件显示props信息: {name + ' ' + age}
+        <ul>
+          {list.map((e, i) => {
+            return <li key={i}>{e}</li>
+          })}
+        </ul>
+      </div>
+    )
+  }
+}
+//对props属性进行验证，(类组件还可以在内部定义static)⭐
+// Child.propTypes = {
+//   name: PropTypes.string.isRequired,
+//   age: PropTypes.number,
+//   list: PropTypes.array,
+// }
+// Child.defaultProps = {
+//   name: 'moren',
+//   age: 12,
+//   list: [21, 342, 55],
+// }
+
+//函数子组件
+function ChildOther(props) {
+  const { name, age } = props
+  return <div>函数子组件显示props信息: {name + ' ' + age}</div>
+}
+ChildOther.propTypes = {
+  name: PropTypes.string,
+  age: PropTypes.number,
+}
+ChildOther.defaultProps = {
+  name: 'ChildOther',
+  age: 45,
+}
+
+//父组件
+export default class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      num: 1,
+      unMount: true,
+    }
+  }
+  render() {
+    return (
+      <div>
+        <Child name="wangyang" age={18} list={[1, 2, 3]} />
+        <Child name="kobe" age={19} list={[1, 2, 3, 5]} />
+        <Child />
+        <hr />
+        <ChildOther name="kobe" age={19} />
+        <ChildOther />
+      </div>
+    )
+  }
+}
+```
+
+##### 子传父
+
