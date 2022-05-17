@@ -31,11 +31,11 @@
     <div id="app">内容被覆盖</div>
     <!-- crossorigin：本地显示远程js包的错误信息 -->
     <script
-      src="https://unpkg.com/react@16/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.development.js"
       crossorigin
     ></script>
     <script
-      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
       crossorigin
     ></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -51,7 +51,9 @@
         render()
       }
       function render() {
-        ReactDOM.render(
+          
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(
           <div>
             <h2>{message}</h2>
             <button onClick={handleClick}>改变文本</button>
@@ -68,11 +70,11 @@
   <body>
     <div id="app"></div>
     <script
-      src="https://unpkg.com/react@16/umd/react.development.js"
+      src="https://unpkg.com/react@18/umd/react.development.js"
       crossorigin
     ></script>
     <script
-      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
       crossorigin
     ></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -104,10 +106,20 @@
         }
       }
       //React中组件名称必须以大写字母开头。⭐ React 会将以小写字母开头的组件视为原生 DOM 标签。
-      ReactDOM.render(<App />, document.getElementById('app'))
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(<App />)
     </script>
   </body>
 ```
+
+> React18之前:
+>
+> ​	`ReactDOM.render(<App />, document.getElementById("app"))`
+>
+> React18:
+>
+> ​	`const root = ReactDOM.createRoot(document.getElementById("app"))
+>    root.render(<App />)`
 
 ## react核心概念
 
@@ -180,7 +192,8 @@ jsx书写规范：
           )
         }
       }
-      ReactDOM.render(<App />, document.getElementById('app'))
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(<App />)
     </script>
 ```
 
@@ -244,7 +257,8 @@ jsx书写规范：
           )
         }
       }
-      ReactDOM.render(<App />, document.getElementById('app'))
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(<App />)
     </script>
 ```
 
@@ -291,7 +305,8 @@ this绑定有三种方式
           console.log('handleClick3')
         }
       }
-      ReactDOM.render(<App />, document.getElementById('app'))
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(<App />)
     </script>
 ```
 
@@ -333,7 +348,8 @@ this绑定有三种方式
           console.log(aaa, event)
         }
       }
-      ReactDOM.render(<App />, document.getElementById('app'))
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(<App />)
     </script>
 ```
 
@@ -348,8 +364,8 @@ this绑定有三种方式
 ```js
   <body>
     <div id="app"></div>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script type="text/babel">
       // const msg1 = <h4>jsxxx</h4>
@@ -367,7 +383,9 @@ this绑定有三种方式
       const msg2 = React.createElement("h4", null, "jsxxx") //不使用jsx也就不需要babel，①jsx其实就是转成React.createElement函数调用
       console.log(msg1) //②返回ReactElement对象
       console.log(msg2) //②返回ReactElement对象
-      ReactDOM.render(msg1, document.getElementById("app")) //③虚拟DOM转化成真实的DOM并塞进根元素
+
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(msg1)//③虚拟DOM转化成真实的DOM并塞进根元素
     </script>
   </body>
 ```
@@ -445,7 +463,8 @@ v-if的效果：
           )
         }
       }
-      ReactDOM.render(<App />, document.getElementById('app'))
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(<App />)
     </script>
 ```
 
@@ -465,8 +484,8 @@ v-show的效果（元素一直存在，不显示就修改display为none）：
 ```jsx
   <body>
     <div id="app"></div>
-    <script src="https://unpkg.com/react@16/umd/react.development.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
     <script type="text/babel">
       class App extends React.Component {
@@ -505,7 +524,8 @@ v-show的效果（元素一直存在，不显示就修改display为none）：
           )
         }
       }
-      ReactDOM.render(<App />, document.getElementById('app'))
+      const root = ReactDOM.createRoot(document.getElementById("app"))
+      root.render(<App />)
     </script>
   </body>
 ```
@@ -576,3 +596,91 @@ create-react-app name
 ![image-20220516152817559](index.assets/image-20220516152817559.png) 
 
 多出的两个文件夹就是配置信息，并且`package.json`文件中之前隐藏的依赖增加了很多
+
+### react组件化
+
+![image-20220517092338090](index.assets/image-20220517092338090.png) 
+
+#### 类组件
+
+* 组件名是`大写字符`开头（无论是类组件还是函数组件）
+* 类组件需要继承自`React.Component`
+* 类组件必须实现`render`函数
+
+> ES6之前，可以通过`create-react-class`模块定义类组件，但是目前官网建议使用ES6的class类定义
+
+使用class来定义一个组件
+
+* constructor是可选的，通常在其中初始化一些数据
+* this.state中维护的就是我们组件内部的数据
+* render()方法是class中唯一必须实现的方法
+
+#### 函数组件
+
+* 没有this对象
+
+* 没有内部的变量
+
+#### render返回值
+
+```js
+  render() {
+    返回React元素，通常通过JSX创建
+    // return (
+    //   <div>
+    //     <h4>哈哈哈</h4>
+    //   </div>
+    // )
+
+    返回一个数组或fragments，使render方法可以返回多个元素
+    // return [<div>sasasas</div>, <div>shahahah</div>]
+
+    返回Portals，可以渲染子节点到不同的DOM子树中
+
+    返回字符串或数值类型，会在DOM中渲染成文本节点
+
+    返回布尔值或null，什么都不渲染
+  }
+```
+
+### 生命周期
+
+![image-20220517104219297](index.assets/image-20220517104219297.png) 
+
+再说生命周期时，都是类的生命周期，`函数式组件没有生命周期函数`，后面再hoos中模拟一些生命周期回调
+
+![image-20220517105208660](index.assets/image-20220517105208660.png) 
+
+各个生命周期做什么事情⭐
+
+* constructor
+
+![image-20220517110126860](index.assets/image-20220517110126860.png) 
+
+* componentDidMount
+
+![image-20220517110225381](index.assets/image-20220517110225381.png) 
+
+* componentDidUpdate
+
+![image-20220517110514183](index.assets/image-20220517110514183.png) 
+
+* componentWillUnmount
+
+![image-20220517110549987](index.assets/image-20220517110549987.png) 
+
+
+
+[不常用的生命周期函数](https://zh-hans.reactjs.org/docs/react-component.html)：
+
+![image-20220517144915927](index.assets/image-20220517144915927.png) 
+
+* shouldComponentUpdate
+
+根据 `shouldComponentUpdate()` 的返回值，判断 React 组件的输出是否受当前 state 或 props 更改的影响。默认行为是 state 每次发生变化组件都会重新渲染(就是发生改变就会执行一下`render()`)。
+
+当 props 或 state 发生变化时，`shouldComponentUpdate()` 会在渲染执行之前被调用。`返回值默认为 true`。首次渲染或使用 `forceUpdate()` 时不会调用该方法。
+
+* getSnapshotBeforeUpdate
+
+`getSnapshotBeforeUpdate()` 在最近一次渲染输出（提交到 DOM 节点）之前调用（数据更新之前调用）。
