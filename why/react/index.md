@@ -790,5 +790,312 @@ export default class App extends Component {
 }
 ```
 
-##### 子传父
+> 子组件中不手动使用super保存props的话，也是可以的，但是在constructor函数中还拿不到数据
+>
+> ```js
+>   //子组件constructor
+>   constructor(props) {
+>     //这里子类如果没有保存props，那么constructor函数中拿不到props，但是react内部会帮你做保存，在render生命周期及之后能拿到⭐，源码可看react-test-renderer
+>     // super()
+>     // console.log(props)//undefined
+>       
+>     super(props)
+>     console.log(props) //super(props)手动做保存可以在constructor中拿到props，正规操作就是自己保存一下
+>   }
+> ```
+
+##### 子传父（状态提升）
+
+```js
+import React, { Component } from "react"
+
+//类子组件
+class Child extends Component {
+  render() {
+    return (
+      <div>
+        类子组件
+        <button onClick={(e) => this.incrementClick(e)}>状态提升</button>
+      </div>
+    )
+  }
+  incrementClick(e) {
+    this.props.btnClick(e, 12, 12512)
+  }
+}
+
+//父组件
+export default class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      num: 1,
+      unMount: true,
+    }
+  }
+  render() {
+    return (
+      <div>
+        {/* 注意，下面第一种方式虽然可以进行状态提升，也可以传递数据，但是在handleClick中拿到的this时子组件中的btnClick函数，而第二种中拿到的才是对的this⭐ */}
+        <Child btnClick={this.handleClick} />
+        <Child btnClick={(e, a, b) => this.handleClick2(e, a, b)} />
+      </div>
+    )
+  }
+  handleClick(e, a, b) {
+    console.log(this) //btnClick
+    console.log("dsafdas", e, a, b)
+  }
+  handleClick2(e, a, b) {
+    console.log(this) //父组件
+    console.log("dsafdas", e, a, b)
+  }
+}
+```
+
+##### 跨组件通信`context`上下文
+
+跨组件通信你可以使用自上而下组件传递，但是往往比较繁琐，而且冗余代码较多
+
+
+
+类组件
+
+* 1.创建context对象并传入默认数据
+
+* 2.context对象内的Provider组件包裹子组件并传值
+
+* 3.设置contextType
+
+* 4.从context对象中获取共享的数据
+
+> 类组件不能实现消费多个context
+
+```js
+import React, { Component } from "react"
+
+//1.创建context对象并传入默认数据
+const UserContext = React.createContext({ name: "", age: 0 })
+
+//孙子组件
+class Grandson extends Component {
+  //3.设置contextType方式一
+  /**
+   * 挂载在 class 上的 contextType 属性可以赋值为由 React.createContext() 创建的 Context 对象。
+   * 此属性可以让你使用 this.context 来获取最近 Context 上的值。你可以在任何生命周期中访问到它，包括 render 函数中。⭐
+   */
+  static contextType = UserContext
+  render() {
+    console.log(this.context)
+    return <div>Grandson</div>
+  }
+}
+//3.设置contextType方式二
+// Grandson.contextType = UserContext
+
+//子组件
+class Child extends Component {
+  render() {
+    return (
+      <div>
+        <Grandson />
+      </div>
+    )
+  }
+}
+//父组件
+export default class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      name: "wangyang",
+      age: 18,
+    }
+  }
+  render() {
+    return (
+      <div>
+        {/* 2.context对象内的Provider组件包裹子组件并传值，如果子组件没有包裹在Provider当中，使用的就是默认数据*/}
+        <UserContext.Provider value={this.state}>
+          <Child />
+        </UserContext.Provider>
+      </div>
+    )
+  }
+}
+```
+
+函数式组件
+
+使用方式大致相同，但是子类组件使用是不是设置`contextType`，而是使用`上下文对象中的Consumer组件`，并且可以实现消费多个context
+
+```js
+import React, { Component } from "react"
+
+//1.创建context对象并传入默认数据
+const UserContext = React.createContext({ name: "", age: 0 })
+const ThemeContext = React.createContext(null)
+
+//孙子组件,函数式组件
+function Grandson() {
+  return (
+    <div>
+      {
+        /**
+         * 函数式组件使用UserContext.Consumer⭐
+         * 这种方法需要一个函数作为子元素（function as a child）。
+         * 这个函数接收当前的 context 值，并返回一个 React 节点。
+         * 传递给函数的 value 值等价于组件树上方离这个 context 最近的 Provider 提供的 value 值。
+         * 如果没有对应的 Provider，value 参数等同于传递给 createContext() 的 defaultValue。
+         * ⭐函数式组件使用UserContext.Consumer，则不需要设置contextType属性
+         */
+        <UserContext.Consumer>
+          {(value) => (
+            <div>
+              <div>名字：{value.name}</div>
+              <div>年龄：{value.age}</div>
+            </div>
+          )}
+        </UserContext.Consumer>
+      }
+      {
+        /**
+         * 消费多个context
+         * 类组件不能同时消费多个contet⭐
+         */
+        <UserContext.Consumer>
+          {(user) => (
+            <ThemeContext.Consumer>
+              {(theme) => (
+                <div>
+                  <div>名字：{user.name}</div>
+                  <div>年龄：{user.age}</div>
+                  <div style={{ color: theme.color }}>我是什么颜色</div>
+                </div>
+              )}
+            </ThemeContext.Consumer>
+          )}
+        </UserContext.Consumer>
+      }
+    </div>
+  )
+}
+
+//子组件
+class Child extends Component {
+  render() {
+    return (
+      <div>
+        <Grandson />
+      </div>
+    )
+  }
+}
+//父组件
+export default class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      name: "wangyang",
+      age: 18,
+    }
+  }
+  render() {
+    return (
+      <div>
+        {/* 2.context对象内的Provider组件包裹子组件，并传值，如果子组件没有包裹在Provider当中，使用的就是默认数据*/}
+        <UserContext.Provider value={this.state}>
+          <ThemeContext.Provider value={{ color: "red" }}>
+            <Child />
+          </ThemeContext.Provider>
+        </UserContext.Provider>
+      </div>
+    )
+  }
+}
+```
+
+#### react中实现`插槽`
+
+* 子组件标签内部的jsx代码会被保存在子组件中的`props.chaldren`数组（一个元素）或者对象中
+* 使用父子传值的方式传入
+
+```js
+import React, { Component } from "react"
+
+//子组件
+class Child extends Component {
+  render() {
+    console.log(this.props.children)
+    return <div>Child {this.props.children[0]}</div>
+  }
+}
+
+//子组件
+class Child2 extends Component {
+  render() {
+    return (
+      <div>
+        Child2 {this.props.leftSlot}
+        <div>{this.props.middleSlot}</div>
+      </div>
+    )
+  }
+}
+
+//父组件
+export default class App extends Component {
+  constructor() {
+    super()
+    this.state = {}
+  }
+  render() {
+    return (
+      <div>
+        <Child>
+          {/* 方式一：直接在标签内部传入，会存在子组件的props.children属性或对象中,使用时使用数组下标获取，但是要注意顺序 */}
+          <div>left</div>
+          <div>middle</div>
+          <div>right</div>
+        </Child>
+        <hr />
+        {/* 方式二：父子传值的方式传入，存放在props对象中*/}
+        <Child2
+          leftSlot={<div>left</div>}
+          middleSlot={<div>middle</div>}
+          rightSlot={<div>right</div>}
+        />
+      </div>
+    )
+  }
+}
+```
+
+
+
+
+
+### 语法补充
+
+#### 编码规范
+
+建议在state中只保存会改变的数据，那些`不会改变的数据可以直接放在constructor函数里面`
+
+```js
+  constructor() {
+    this.list = ["一楼", "二楼", "三楼"]
+    this.state = {
+      currentIndex: 0,
+    }
+  }
+```
+
+#### 属性展开
+
+传入给子组件的数据可以直接展开写，在子组件中的props对象中拿到
+
+```js
+<Child {...this.state} />
+<Child {...this.props} />
+```
 
