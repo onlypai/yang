@@ -1085,13 +1085,122 @@ setState方法继承自`React.Component`类
 
 #### 如何获取异步结果
 
+```js
+import React, { Component } from "react"
 
+//获取异步数据
+export default class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      name: "wangyang",
+      age: 18,
+    }
+  }
+  //方式二
+  componentDidUpdate() {
+    console.log(this.state.name) //先获取
+  }
+  render() {
+    return (
+      <div>
+        <button onClick={() => this.handleClick()}>修改数据</button>
+      </div>
+    )
+  }
+  handleClick() {
+    this.setState(
+      {
+        name: "kobe",
+      },
+      () => {
+        //方式一
+        //第二个参数接收一个函数，这里可以获取异步数据，类似vue $nextTick
+        console.log(this.state.name) //后获取
+      }
+    )
+  }
+}
+```
 
+#### 使setState同步更新
 
+reatc18版本之前，在定时器中和执行原生函数中设置setState是同步的，
 
+```js
+  componentDidMount() {
+    //方式一：使用原生事件
+    document.getElementById('btn').addEventListener('click', () => {
+      this.setState({
+        name: 'kobe',
+      })
+      console.log(this.state.name)
+    })
+  }
 
+  handleClick() {
+    // 方式二：在定时器中执行
+    setTimeout(() => {
+      this.setState({
+        name: 'kobe',
+      })
+      console.log(this.state.name)
+    }, 0)
+  }
+```
 
+#### setState数据的合并操作
 
+当你调用`this.setState({name:'traeyoung'})`设置state中的属性时，是不是担心之前state中别的数据会被覆盖
+
+react的操作是执行此方法时，实际上是调用`Object.assign({},this.state,{name:'kobe'})`，依次将源对象（第二个和第三个）复制到目标对象（第一个）中，此方法返回目标对象
+
+这样其他的属性还在，并且新的name属性覆盖了之前的
+
+#### setState本身的合并
+
+```js
+ //age=0 
+ handleClick() {
+    this.setState({
+      age: this.state.age + 1,
+    })
+    this.setState({
+      age: this.state.age + 1,
+    })
+    this.setState({
+      age: this.state.age + 5,
+    })
+    //age=1
+    //内部会把三次执行setState合并成一次，每次做的操作一样，使用do while遍历队列，也是使用Object.assign复制源对象到目标对象，只会执行较后一次
+  }
+```
+
+如果你确实是想连续执行`setState`的操作，可以使用`updater`函数的方式
+
+```js
+  //age=0 
+  handleClick() {
+    //使用updater函数，这种方式也会调用do while遍历队列，但是updater函数中的第一个参数永远是前一次setState更新后的数据
+    this.setState((prevState, props) => {
+      //props参数用的较少
+      return {
+        age: prevState.age + 1,
+      }
+    })
+    this.setState((prevState) => {
+      return {
+        age: prevState.age + 1,
+      }
+    })
+    this.setState((prevState) => {
+      return {
+        age: prevState.age + 1,
+      }
+    })
+    //age=3
+  }
+```
 
 
 
