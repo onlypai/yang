@@ -836,7 +836,7 @@ export default class App extends Component {
   render() {
     return (
       <div>
-        {/* 注意，下面第一种方式虽然可以进行状态提升，也可以传递数据，但是在handleClick中拿到的this时子组件中的btnClick函数，而第二种中拿到的才是对的this⭐ */}
+        {/* 注意，下面第一种方式虽然可以进行状态提升，也可以传递数据，但是在handleClick中拿到的this是子组件中的btnClick函数，而第二种中拿到的才是对的this⭐ */}
         <Child btnClick={this.handleClick} />
         <Child btnClick={(e, a, b) => this.handleClick2(e, a, b)} />
       </div>
@@ -867,9 +867,9 @@ export default class App extends Component {
 
 * 3.设置contextType
 
-* 4.从context对象中获取共享的数据
+* 4.从`context`对象中获取共享的数据
 
-> 类组件不能实现消费多个context
+> 类组件不能实现同时消费多个context
 
 ```js
 import React, { Component } from "react"
@@ -1070,6 +1070,46 @@ export default class App extends Component {
   }
 }
 ```
+
+### 关于`setState`
+
+setState方法继承自`React.Component`类
+
+![image-20220519151644175](index.assets/image-20220519151644175.png) 
+
+#### setState异步更新
+
+使用异步更新的原因
+
+![image-20220519152658047](index.assets/image-20220519152658047.png) 
+
+#### 如何获取异步结果
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
