@@ -56,7 +56,7 @@
       root.render(
           <div>
             <h2>{message}</h2>
-            <button onClick={handleClick}>改变文本</button>
+            <button onClick={handleClick}>改变文本</button>   
           </div>,
           document.getElementById('app')
         )
@@ -118,8 +118,8 @@
 >
 > React18:
 >
-> ​	`const root = ReactDOM.createRoot(document.getElementById("app"))
->    root.render(<App />)`
+> ​	 `const root = ReactDOM.createRoot(document.getElementById("app"))
+>       root.render(<App />)`
 
 ## react核心概念
 
