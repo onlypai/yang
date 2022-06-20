@@ -579,6 +579,33 @@ create-react-app name
 
 ![image-20220516144522050](index.assets/image-20220516144522050.png) 
 
+`reportWebVitals.js`
+
+这个webVital是Google提出的、检测用户体验的标准，这些指标包含三个关键指标（CLS、FID、LCP）和两个辅助指标（FCP、TTFB）。具体含义如下（参考链接）：
+
+* **LCP** (Largest Contentful Paint)：最大内容渲染时间。指的是从用户请求网址到窗口中渲染最大可见内容所需要的时间（最大可见内容通常是图片或者视频，或者大块的文本）。
+
+* **FID** (First Input Delay):首次输入延迟。指的是从用户首次与网页互动（点击链接、按钮等）到浏览器响应此次互动直接的时间。用于判断网页进入互动状态的时间。
+
+* **CLS** (Cumulative Layout Shift) :累计布局偏移，得分范围0-1，指的是网页布局在加载期间的偏移量，0表示没有偏移，1表示最大偏移，这个指标指示用户与网站的交互体验，如果网址在加载过程布局一直跳动，用户体验会很差。比如加载一张图片，但没有大小空白占位，导致图片显示时页面高度跳动。
+
+* **FCP**(First Contentful Paint)首次内容绘制。标记浏览器渲染来自 DOM 第一位内容的时间点，内容可能是文本、图像等元素。
+* **TTFB** (Time to First Byte) 首字节到达的时间点。
+
+通过把`index.js`文件的最后一行改为：
+
+```js
+reportWebVitals(console.warn);
+```
+
+![image-20220620110449871](index.assets/image-20220620110449871.png) 
+
+FCP值表示，当前页面中元素最早出现时间是在页面开始加载后的7154ms。
+
+LCP值表示元素最晚出现的时间是加载开始后7185.8ms。
+
+CLS值表示我的页面中元素的没有偏移，在缩放变换后该值还是0，那么说明这个页面还是比较稳定流畅的。
+
 ### PWA-渐进式WEB应用
 
 ![image-20220516145337395](index.assets/image-20220516145337395.png) 
@@ -587,11 +614,13 @@ create-react-app name
 
 ### 脚手架中的webpack
 
-和`vue-cli3`脚手架一样，react脚手架将有关微博pack的配置信息都隐藏起来了
+和`vue-cli3`脚手架一样，react脚手架将有关webpack的配置信息都隐藏起来了
 
 如果想查看webpack相关配置信息，运行`npm run eject`命令，前提是你的本地代码需要全部提交（本地无修改）
 
 ![image-20220516152422723](index.assets/image-20220516152422723.png) 
+
+`permanent`：永恒的，不可逆的；暴露之后无法再隐藏起来
 
 ![image-20220516152817559](index.assets/image-20220516152817559.png) 
 
@@ -804,6 +833,100 @@ export default class App extends Component {
 >   }
 > ```
 
+```js
+import PropTypes from 'prop-types';
+
+MyComponent.propTypes = {
+  // 你可以将属性声明为 JS 原生类型，默认情况下
+  // 这些属性都是可选的。
+  optionalArray: PropTypes.array,
+  optionalBool: PropTypes.bool,
+  optionalFunc: PropTypes.func,
+  optionalNumber: PropTypes.number,
+  optionalObject: PropTypes.object,
+  optionalString: PropTypes.string,
+  optionalSymbol: PropTypes.symbol,
+
+  // 任何可被渲染的元素（包括数字、字符串、元素或数组）
+  // (或 Fragment) 也包含这些类型。
+  optionalNode: PropTypes.node,
+
+  // 一个 React 元素。(插槽)
+  optionalElement: PropTypes.element,
+
+  // 一个 React 元素类型（即，MyComponent）。
+  optionalElementType: PropTypes.elementType,
+
+  // 你也可以声明 prop 为类的实例，这里使用
+  // JS 的 instanceof 操作符。
+  optionalMessage: PropTypes.instanceOf(Message),
+
+  // 你可以让你的 prop 只能是特定的值，指定它为
+  // 枚举类型。
+  optionalEnum: PropTypes.oneOf(['News', 'Photos']),
+
+  // 一个对象可以是几种类型中的任意一个类型
+  optionalUnion: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.number,
+    PropTypes.instanceOf(Message)
+  ]),
+
+  // 可以指定一个数组由某一类型的元素组成
+  optionalArrayOf: PropTypes.arrayOf(PropTypes.number),
+
+  // 可以指定一个对象由某一类型的值组成
+  optionalObjectOf: PropTypes.objectOf(PropTypes.number),
+
+  // 可以指定一个对象由特定的类型值组成
+  optionalObjectWithShape: PropTypes.shape({
+    color: PropTypes.string,
+    fontSize: PropTypes.number
+  }),
+
+  // An object with warnings on extra properties
+  optionalObjectWithStrictShape: PropTypes.exact({
+    name: PropTypes.string,
+    quantity: PropTypes.number
+  }),
+
+  // 你可以在任何 PropTypes 属性后面加上 `isRequired` ，确保
+  // 这个 prop 没有被提供时，会打印警告信息。
+  requiredFunc: PropTypes.func.isRequired,
+
+  // 任意类型的必需数据
+  requiredAny: PropTypes.any.isRequired,
+
+  // 你可以指定一个自定义验证器。它在验证失败时应返回一个 Error 对象。
+  // 请不要使用 `console.warn` 或抛出异常，因为这在 `oneOfType` 中不会起作用。
+  customProp: function(props, propName, componentName) {
+    if (!/matchme/.test(props[propName])) {
+      return new Error(
+        'Invalid prop `' + propName + '` supplied to' +
+        ' `' + componentName + '`. Validation failed.'
+      );
+    }
+  },
+
+  // 你也可以提供一个自定义的 `arrayOf` 或 `objectOf` 验证器。
+  // 它应该在验证失败时返回一个 Error 对象。
+  // 验证器将验证数组或对象中的每个值。验证器的前两个参数
+  // 第一个是数组或对象本身
+  // 第二个是他们当前的键。
+  customArrayProp: PropTypes.arrayOf(function(propValue, key, componentName, location, propFullName) {
+    if (!/matchme/.test(propValue[key])) {
+      return new Error(
+        'Invalid prop `' + propFullName + '` supplied to' +
+        ' `' + componentName + '`. Validation failed.'
+      );
+    }
+  })
+};
+
+```
+
+
+
 ##### 子传父（状态提升）
 
 ```js
@@ -927,7 +1050,7 @@ export default class App extends Component {
 
 函数式组件
 
-使用方式大致相同，但是子类组件使用是不是设置`contextType`，而是使用`上下文对象中的Consumer组件`，并且可以实现消费多个context
+使用方式大致相同，但是子类组件使用不是设置`contextType`，而是使用`上下文对象中的Consumer组件`，并且可以实现消费多个context
 
 ```js
 import React, { Component } from "react"
@@ -961,7 +1084,7 @@ function Grandson() {
       {
         /**
          * 消费多个context
-         * 类组件不能同时消费多个contet⭐
+         * 类组件不能同时消费多个context⭐
          */
         <UserContext.Consumer>
           {(user) => (
@@ -1053,7 +1176,7 @@ export default class App extends Component {
     return (
       <div>
         <Child>
-          {/* 方式一：直接在标签内部传入，会存在子组件的props.children属性或对象中,使用时使用数组下标获取，但是要注意顺序 */}
+          {/* 方式一：直接在标签内部传入，会存在子组件的props.children数组或对象中,使用时使用数组下标获取，但是要注意顺序 */}
           <div>left</div>
           <div>middle</div>
           <div>right</div>
@@ -1171,8 +1294,8 @@ react的操作是执行此方法时，实际上是调用`Object.assign({},this.s
     this.setState({
       age: this.state.age + 5,
     })
-    //age=1
-    //内部会把三次执行setState合并成一次，每次做的操作一样，使用do while遍历队列，也是使用Object.assign复制源对象到目标对象，只会执行较后一次
+    //age=5
+    //内部会把三次执行setState合并成一次，每次做的操作一样，都是设置age的值，使用do while遍历队列，也是使用Object.assign复制源对象到目标对象，只会执行较后一次
   }
 ```
 
