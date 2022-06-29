@@ -142,6 +142,9 @@ nvm install latest
 # 卸载指定版本的node
 nvm  uninstall <version>
 
+# 安装指定版本
+nvm install 14.18.1
+
 # 指定版本：进行node版本切换
 nvm use <version>
 ```
