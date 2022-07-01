@@ -1272,6 +1272,26 @@ reatc18版本之前，在定时器中和执行原生函数中设置setState是�
   }
 ```
 
+![image-20220701101505127](index.assets/image-20220701101505127.png) 
+
+> 合成事件
+>
+> ```js
+> render() {
+>     return (
+>       <div>
+>         <button onClick={() => this.handleClick()}>修改数据</button>
+>       </div>
+>     )
+>   }
+> ```
+>
+> 这里的`onClick`就是合成事件
+>
+> react开发的项目，你可以跑在浏览器中，也可以使用react-native跑在移动端中
+>
+> 所以对于jsx代码：跑在浏览器中，产生的就是浏览器的DOM事件对象，跑在移动端，产生的就是移动端原生控件的对象
+
 #### setState数据的合并操作
 
 当你调用`this.setState({name:'traeyoung'})`设置state中的属性时，是不是担心之前state中别的数据会被覆盖
