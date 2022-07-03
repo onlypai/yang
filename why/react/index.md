@@ -353,7 +353,7 @@ this绑定有三种方式
     </script>
 ```
 
-#### jsx本质
+#### jsx本质（react的渲染流程）
 
 实际上，jsx仅仅是`React.createElement(component,props,...children)`函数的语法糖
 
@@ -400,11 +400,12 @@ this绑定有三种方式
 
 ![image-20220513153656809](index.assets/image-20220513153656809.png) 
 
-③`ReactDOM.render(<App/>,document.getElementById("app"))`方法将虚拟DOM与真实的DOM同步（映射）起来，这个过程叫做`协调（Reconciliation）`
+③`const root = ReactDOM.createRoot(document.getElementById("app"))
+   root.render(<App />)`方法将虚拟DOM与真实的DOM同步（映射）起来，这个过程叫做`协调（Reconciliation）`
 
-> WEB开发中的流程：jsx -> React.createElement() -> ReactElement对象 -> 经过ReactDOM.render -> 真实的DOM
+> WEB开发中的流程：jsx -> React.createElement() -> ReactElement对象 -> 经过root.render -> 真实的DOM
 >
-> react-navite中的流程：jsx -> React.createElement() -> ReactElement对象 -> 经过ReactDOM.render -> 原生的（移动端）控件
+> react-navite中的流程：jsx -> React.createElement() -> ReactElement对象 -> 经过root.render -> 原生的（移动端）控件
 
 ![image-20220513154241155](index.assets/image-20220513154241155.png) 
 
@@ -1345,9 +1346,25 @@ react的操作是执行此方法时，实际上是调用`Object.assign({},this.s
   }
 ```
 
-### React更新机制
+### React更新机制（diff算法、keys优化）
 
-08- 1：20：30
+![image-20220703102907624](index.assets/image-20220703102907624.png) 
+
+![image-20220703103722203](index.assets/image-20220703103722203.png) 
+
+![image-20220703115345967](index.assets/image-20220703115345967.png) 
+
+
+
+![image-20220703115543514](index.assets/image-20220703115543514.png) 
+
+` keys`属性的使用原因：mutation的产生
+
+![image-20220703115926523](index.assets/image-20220703115926523.png) 
+
+**keys的优化：**
+
+![image-20220703120918986](index.assets/image-20220703120918986.png) 
 
 
 
