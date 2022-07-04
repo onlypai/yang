@@ -1346,7 +1346,9 @@ react的操作是执行此方法时，实际上是调用`Object.assign({},this.s
   }
 ```
 
-### React更新机制（diff算法、keys优化）
+### React更新机制
+
+#### diff算法、keys优化
 
 ![image-20220703102907624](index.assets/image-20220703102907624.png) 
 
@@ -1366,25 +1368,266 @@ react的操作是执行此方法时，实际上是调用`Object.assign({},this.s
 
 ![image-20220703120918986](index.assets/image-20220703120918986.png) 
 
+#### 组件嵌套的render函数调用(性能优化)
 
+`shouldComponentUpdate`生命周期函数，函数默认返回`true`，表示数据更新，render函数就会重新渲染，如果返回`false`，render函数就不会重新渲染，以此得到性能优化
 
+该函数有两个参数：`nextProps`，`nextState`，更新后的props和state
 
+```js
+import React, { Component } from "react"
 
+class Banner extends Component {
+  render() {
+    console.log("Banner")
+    return <h4>Banner</h4>
+  }
+}
+class Main extends Component {
+  render() {
+    console.log("Main")
+    return <Banner></Banner>
+  }
+}
 
+class Header extends Component {
+  render() {
+    console.log("Header")
+    return <h4>header</h4>
+  }
+}
+class Footer extends Component {
+  render() {
+    console.log("Footer")
+    return <h4>footer</h4>
+  }
+}
 
+export default class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      counter: 0,
+      message: "哈哈",
+    }
+  }
+  render() {
+    console.log("App")
+    return (
+      <div>
+        {this.state.counter}
+        <button onClick={() => this.handleClick()}>修改数据</button>
+        <button onClick={() => this.handleClick2()}>修改文本</button>
+        <Header></Header>
+        <Main></Main>
+        <Footer></Footer>
+      </div>
+    )
+  }
+  //控制当前组件在数据更新时是否重新渲染⭐
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.counter !== nextState.counter) {
+      return true
+    }
+    return false
+  }
+  //点击按钮使用setState修改数据，这会使render函数重新渲染，所以所有嵌套组件中的render都会重新渲染
+  //并且该组件中并没有使用改变的message数据，这显然是不合理的，我们仅希望修改counter时重新渲染
+  handleClick() {
+    this.setState({
+      counter: this.state.counter + 1,
+    })
+  }
+  handleClick2() {
+    this.setState({
+      message: this.state.message + "哈",
+    })
+  }
+}
+```
 
+问题：
 
+* 每个类都需要手动执行该生命周期函数吗?
 
+`React.PureComponent`的使用
 
+```js
+  shouldComponentUpdate(nextProps, nextState) {
+    if (this.props.color !== nextProps.color) {
+      return true;
+    }
+    if (this.state.count !== nextState.count) {
+      return true;
+    }
+    return false;
+  }
+```
 
+在这段代码中，`shouldComponentUpdate` 仅检查了 `props.color` 或 `state.count` 是否改变。
 
+如果这些值没有改变，那么这个组件不会更新。
 
+如果你的组件更复杂一些，你可以使用类似`“浅比较”`的模式来检查 `props` 和 `state` 中所有的字段，以此来决定是否组件需要更新。
 
+在每个类组件中都使用shouldComponentUpdate函数过于麻烦，我们可以将`类组件`继承自` React.PureComponent `来自动的进行 浅比较
 
+```js
+import React, { PureComponent } from "react"
 
+class Banner extends PureComponent {
+  render() {
+    console.log("Banner")
+    return <h4>Banner</h4>
+  }
+}
+class Main extends PureComponent {
+  render() {
+    console.log("Main")
+    return <Banner></Banner>
+  }
+}
 
+export default class App extends PureComponent {//⭐
+  constructor() {
+    super()
+    this.state = {
+      counter: 0,
+      message: "哈哈",
+    }
+  }
+  render() {
+    console.log("App")
+    return (
+      <div>
+        {this.state.counter}
+        <button onClick={() => this.handleClick()}>修改数据</button>
+        <button onClick={() => this.handleClick2()}>修改文本</button>
+        <Main></Main>
+      </div>
+    )
+  }
+  handleClick() {
+    this.setState({
+      counter: this.state.counter + 1,
+    })
+  }
+  handleClick2() {
+    this.setState({
+      message: this.state.message + "哈",
+    })
+  }
+}
+```
 
+* 函数组件没有生命周期，如何解决该问题?
 
+`memo`的使用
+
+```js
+//memo是一个函数，实际上也是一个高阶组件，这个函数传递一个函数，返回一个新的函数组件
+const MemoHeader = memo(function () {
+  console.log("header")
+  return <h4>header</h4>
+})
+```
+
+```js
+import React, { PureComponent, memo } from "react"
+
+//Banner组件没有使用memo包裹，但是也没有重新渲染，是因为Main类组件继承自了PureComponent，父组件本身就不会渲染
+function Banner() {
+  console.log("Banner")
+  return <h4>banner</h4>
+}
+class Main extends PureComponent {
+  render() {
+    console.log("Main")
+    return <Banner></Banner>
+  }
+}
+
+const MemoHeader = memo(function () {
+  console.log("header")
+  return <h4>header</h4>
+})
+const MemoFooter = memo(function () {
+  console.log("footer")
+  return <h4>footer</h4>
+})
+
+export default class App extends PureComponent {
+  //⭐
+  constructor() {
+    super()
+    this.state = {
+      counter: 0,
+      message: "哈哈",
+    }
+  }
+  render() {
+    console.log("App")
+    return (
+      <div>
+        {this.state.counter}
+        <button onClick={() => this.handleClick()}>修改数据</button>
+        <button onClick={() => this.handleClick2()}>修改文本</button>
+        <MemoHeader />
+        <Main></Main>
+        <MemoFooter />
+      </div>
+    )
+  }
+  handleClick() {
+    this.setState({
+      counter: this.state.counter + 1,
+    })
+  }
+  handleClick2() {
+    this.setState({
+      message: this.state.message + "哈",
+    })
+  }
+}
+```
+
+> 理论上，所有的类组件都可以继承自`React.PureComponent`，所有的函数组件都可以使用`memo`包裹
+
+> 源码：浅层比较函数`shallowEqual`，PureComponent和memo都是使用浅层比较，
+>
+> memo方式中，如果你传入比较函数就是用传入的函数，没有传入就用shallowEqual
+>
+> ![image-20220704155915379](index.assets/image-20220704155915379.png) 
+
+### setState不可变性
+
+* 需求是在`friends`数组后面添加新的一项：
+
+![image-20220704165252685](index.assets/image-20220704165252685.png) 
+
+这种写法，先直接在数组后面push一个新的项，再使用setState进行render重新渲染，但是这种方式根本不会重新渲染render
+
+理由：
+
+```js
+this.setState({
+    friends:this.state.friends
+})
+```
+
+这时的两个数据其实指向的根本就是同一个`内存地址`，之后在`shoudleComponentUpdate`中浅比较时虽然看似更改了数组，但是并未更改，所以函数返回false，不会进行render重新渲染
+
+正确方式：`必须保证state中数据是不变的`
+
+![image-20220704171037040](index.assets/image-20220704171037040.png) 
+
+* 改变数组其中某一项中的数据，道理也是一样
+
+![image-20220704171438953](index.assets/image-20220704171438953.png) 
+
+![image-20220704172020253](index.assets/image-20220704172020253.png) 
+
+> 在该例中，如果不进行浅比较（直接继承自`React.Component`）是没有问题的，但是没有得到性能优化，如果进行浅比较，就要保证setState数据的不可变性
 
 ### 语法补充
 
