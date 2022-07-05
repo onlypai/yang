@@ -993,7 +993,7 @@ export default class App extends Component {
 
 * 4.从`context`对象中获取共享的数据
 
-> 类组件不能实现同时消费多个context
+> 类组件实现同时消费多个context，需要使用函数时组件的Consumer组件
 
 ```js
 import React, { Component } from "react"
@@ -1016,6 +1016,28 @@ class Grandson extends Component {
 }
 //3.设置contextType方式二
 // Grandson.contextType = UserContext
+
+//孙子组件同时消费多个context⭐
+//class Grandson extends Component {
+ // render() {
+ //   return (
+ //   	<UserContext.Consumer>
+   //       {(user) => (
+ //           <ThemeContext.Consumer>
+       //       {(theme) => (
+     //           <div>
+        //          <div>名字：{user.name}</div>
+        //          <div>年龄：{user.age}</div>
+         //         <div style={{ color: theme.color }}>我是什么颜色</div>
+        //        </div>
+        //      )}
+       //     </ThemeContext.Consumer>
+       //   )}
+      //  </UserContext.Consumer>
+   // )
+//  }
+//}
+
 
 //子组件
 class Child extends Component {
@@ -1085,7 +1107,7 @@ function Grandson() {
       {
         /**
          * 消费多个context
-         * 类组件不能同时消费多个context⭐
+         * 类组件同时消费多个context也是用这种方式⭐
          */
         <UserContext.Consumer>
           {(user) => (
@@ -1138,6 +1160,77 @@ export default class App extends Component {
   }
 }
 ```
+
+#### 全局事件传递events
+
+```shell
+yarn add events
+```
+
+```js
+import React, { PureComponent } from "react"
+import { EventEmitter } from "events"
+
+//创建事件总线
+const eventBus = new EventEmitter()
+
+class Header extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        <button
+          onClick={() => {
+            this.handleClick()
+          }}
+        >
+          发出事件
+        </button>
+        <h4>header</h4>
+      </div>
+    )
+  }
+  handleClick() {
+    eventBus.emit("helloEmit", 111, 222)
+  }
+}
+class Footer extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  //监听
+  componentDidMount() {
+    // eventBus.on("helloEmit", this.helloEmitListener)
+    eventBus.addListener("helloEmit", this.helloEmitListener) //两种方式都可以
+  }
+  //取消监听
+  componentWillUnmount() {
+    // eventBus.off("helloEmit", this.helloEmitListener)
+    eventBus.removeListener("helloEmit", this.helloEmitListener)
+  }
+  helloEmitListener(num1, num2) {
+    console.log(num1, num2)
+  }
+  render() {
+    return <h4>footer</h4>
+  }
+}
+
+export default class App extends PureComponent {
+  render() {
+    return (
+      <div>
+        <Header></Header>
+        <Footer></Footer>
+      </div>
+    )
+  }
+}
+```
+
+
 
 #### react中实现`插槽`
 
@@ -1628,6 +1721,279 @@ this.setState({
 ![image-20220704172020253](index.assets/image-20220704172020253.png) 
 
 > 在该例中，如果不进行浅比较（直接继承自`React.Component`）是没有问题的，但是没有得到性能优化，如果进行浅比较，就要保证setState数据的不可变性
+>
+> * 不改变原本数组，我们可以使用`ES6扩展运算符`
+>
+> * 不改变原本对象，可以使用`Object.assign`方法，也可以使用`ES6扩展运算符`
+
+
+
+### 受控组件和非受控组件
+
+#### `ref`
+
+![image-20220705112303728](index.assets/image-20220705112303728.png) 
+
+ref属性的值：可以是两种类型：`对象、函数 `  //字符串类型已启用
+
+* 对象方式使用`createRef`api创建，在 ref 的 `current` 属性中访问
+
+ref类型：
+
+- 当 `ref` 属性用于 HTML 元素时，构造函数中使用 `React.createRef()` 创建的 `ref` 接收底层 DOM 元素作为其 `current` 属性。
+- 当 `ref` 属性用于自定义 class 组件时，`ref` 对象接收组件的挂载实例作为其 `current` 属性。
+- **你不能在函数组件上使用 `ref` 属性**，因为他们没有实例。
+
+> 当 `ref` 属性用于自定义 class 组件时
+>
+> React 会在组件挂载时给 `current` 属性传入 DOM 元素，并在组件卸载时传入 `null` 值。`ref` 会在 `componentDidMount` 或 `componentDidUpdate` 生命周期钩子触发前更新。
+
+```js
+import React, { PureComponent, createRef } from "react"
+
+class Child extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      counter: 0,
+    }
+  }
+  render() {
+    return (
+      <div>
+        <div>{this.state.counter}</div>
+        <button onClick={() => this.addNum()}>+</button>
+      </div>
+    )
+  }
+  addNum() {
+    this.setState({
+      counter: this.state.counter + 1,
+    })
+  }
+}
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.titleRef = createRef()
+    this.ChildRef = createRef()
+    this.titleEl = null
+  }
+  render() {
+    return (
+      <div>
+        {/* 对象方式，推荐使用 */}
+        <h4 ref={this.titleRef}>hello111</h4>
+        {/* 函数方式 */}
+        <h4 ref={(arg) => (this.titleEl = arg)}>hello222</h4>
+        <button onClick={() => this.handleClick()}>获取</button>
+        <hr />
+
+        <button onClick={() => this.handleChild()}>执行子类组件中的方法</button>
+        {/* 为 class 组件添加 Ref */}
+        <Child ref={this.ChildRef}></Child>
+      </div>
+    )
+  }
+  handleClick() {
+    //对象方式
+    console.log(this.titleRef.current)
+    this.titleRef.current.innerHTML = "createRef"
+    //回调函数方式
+    console.log(this.titleEl)
+    this.titleEl.innerHTML = "func"
+  }
+  handleChild() {
+    this.ChildRef.current.addNum()
+  }
+}
+```
+
+如果要在函数组件中使用 `ref`，你可以使用 [`forwardRef`](https://react.docschina.org/docs/forwarding-refs.html)（可与 [`useImperativeHandle`](https://react.docschina.org/docs/hooks-reference.html#useimperativehandle) 结合使用），或者可以将该组件转化为 class 组件。
+
+
+
+#### 受控组件、非受控组件
+
+* 受控组件
+
+![image-20220705142548369](index.assets/image-20220705142548369.png) 
+
+![image-20220705152413943](index.assets/image-20220705152413943.png) 
+
+受控组件基本演练
+
+```js
+import React, { PureComponent } from "react"
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      form: {
+        username: "科比",
+        duty: "SG",
+      },
+    }
+  }
+  render() {
+    return (
+      <div>
+        <form
+          onSubmit={(e) => {
+            this.handleSubmit(e)
+          }}
+        >
+          <label htmlFor="username">
+            用户：
+            {/* 这个input就是受控组件 */}
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={this.state.form.username}
+              onChange={(e) => this.formItemChange(e)}
+            ></input>
+          </label>
+          <label htmlFor="duty">
+            司职：
+            {/* 这个select就是受控组件 */}
+            <select
+              id="duty"
+              value={this.state.form.duty}
+              name="duty"
+              onChange={(e) => this.formItemChange(e)}
+            >
+              <option value="PG">控球后卫</option>
+              <option value="SG">得分后卫</option>
+              <option value="SF">小前锋</option>
+            </select>
+          </label>
+          <button type="submit">提交</button>
+        </form>
+      </div>
+    )
+  }
+  handleSubmit(e) {
+    e.preventDefault()
+    console.log(this.state.form)
+  }
+  // usernameChange(e) {
+  //   const username = e.target.value
+  //   this.setState({
+  //     form: Object.assign({}, this.state.form, { username }),
+  //   })
+  // }
+  // dutyChange(e) {
+  //   this.setState({
+  //     form: { ...this.state.form, duty: e.target.value },
+  //   })
+  // }
+
+  //处理函数合并
+  formItemChange(e) {
+    this.setState({
+      // [e.target.name] ES6计算属性名⭐
+      form: { ...this.state.form, [e.target.name]: e.target.value },
+    })
+  }
+}
+```
+
+* 非受控组件
+
+不推荐使用非受控组件
+
+![image-20220705162546070](index.assets/image-20220705162546070.png) 
+
+```js
+import React, { createRef, PureComponent } from "react"
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.usernameRef = createRef()
+    this.state = {
+      form: {
+        username: "科比",
+      },
+    }
+  }
+  render() {
+    return (
+      <div>
+        <form
+          onSubmit={(e) => {
+            this.handleSubmit(e)
+          }}
+        >
+          <label htmlFor="username">
+            用户：
+            <input type="text" id="username" ref={this.usernameRef}></input>
+          </label>
+
+          <button type="submit">提交</button>
+        </form>
+      </div>
+    )
+  }
+  handleSubmit(e) {
+    e.preventDefault()
+    this.state.form.username = this.usernameRef.current.value
+    console.log(this.state.form)
+  }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ### 语法补充
 
