@@ -1741,7 +1741,7 @@ ref属性的值：可以是两种类型：`对象、函数 `  //字符串类型�
 ref类型：
 
 - 当 `ref` 属性用于 HTML 元素时，构造函数中使用 `React.createRef()` 创建的 `ref` 接收底层 DOM 元素作为其 `current` 属性。
-- 当 `ref` 属性用于自定义 class 组件时，`ref` 对象接收组件的挂载实例作为其 `current` 属性。
+- 当 `ref` 属性用于自定义 class 组件时，`ref` 对象接收组件的挂载`实例对象`作为其 `current` 属性。
 - **你不能在函数组件上使用 `ref` 属性**，因为他们没有实例。
 
 > 当 `ref` 属性用于自定义 class 组件时
@@ -1810,6 +1810,42 @@ export default class App extends PureComponent {
 ```
 
 如果要在函数组件中使用 `ref`，你可以使用 [`forwardRef`](https://react.docschina.org/docs/forwarding-refs.html)（可与 [`useImperativeHandle`](https://react.docschina.org/docs/hooks-reference.html#useimperativehandle) 结合使用），或者可以将该组件转化为 class 组件。
+
+#### `forwardRef` (ref转发)
+
+函数组件上使用ref获取的是组件内部`某个`DOM元素，看你把ref属性设置在哪个DOM元素上⭐ 
+
+```js
+import React, { PureComponent, createRef, forwardRef } from "react"
+
+//函数组件使用forwardRef高阶组件包裹，可以传入第二个参数ref
+const Child = forwardRef(function (props, ref) {
+  return (
+    <div>
+      <h4 ref={ref}>forwardRef{props.name}</h4>
+    </div>
+  )
+})
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.ChildRef = createRef()
+  }
+  render() {
+    return (
+      <div>
+        {/* 如果不使用forwardRef，这里直接传入ref属性无效 */}
+        <Child ref={this.ChildRef} name="组件aaaa" />
+        <button onClick={() => this.handleClick()}>获取</button>
+      </div>
+    )
+  }
+  handleClick() {
+    console.log(this.ChildRef.current)
+  }
+}
+
+```
 
 
 
@@ -1945,13 +1981,308 @@ export default class App extends PureComponent {
 }
 ```
 
+### 高阶组件
+
+![image-20220706102619632](index.assets/image-20220706102619632.png) 
+
+![image-20220706105213147](index.assets/image-20220706105213147.png) 
+
+```js
+import React, { PureComponent } from "react"
+
+class Home extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return <div>{this.props.name}</div>
+  }
+}
+
+//定义高阶组件
+function enhanceComponent(WapperdComponent) {
+  class NewComponent extends PureComponent {
+    render() {
+      return <WapperdComponent {...this.props} />
+    }
+  }
+  NewComponent.displayName = "Kobe" //使用displayName属性修改组件(在devtools中)展示的名字，很少改动
+  return NewComponent
+}
+const EnhanceHome = enhanceComponent(Home)
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        <EnhanceHome name="haha" />
+      </div>
+    )
+  }
+}
+```
+
+![image-20220706110504453](index.assets/image-20220706110504453.png) 
+
+> 高阶组件内部也可以返回`函数组件`
 
 
 
+#### 高阶组件应用
+
+##### props 和 context
+
+* 增强props
+
+有些props是相同的，不需要欸个传入，使用高阶组件，可以从高阶组件中获取更多的props，`react-router`中的`withRouter`高阶组件就是一个例子
+
+```js
+import React, { PureComponent } from "react"
+
+class Home extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        {this.props.name}
+        {this.props.county}
+      </div>
+    )
+  }
+}
+class About extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        {this.props.name}
+        {this.props.county}
+      </div>
+    )
+  }
+}
+
+//增强props
+function enhanceComponent(WapperdComponent) {
+  return class NewComponent extends PureComponent {
+    render() {
+      return <WapperdComponent {...this.props} level={100} county="中国" />
+    }
+  }
+}
+const EnhanceHome = enhanceComponent(Home)
+const EnhanceAbout = enhanceComponent(About)
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        <EnhanceHome name="haha" />
+        <EnhanceAbout name="kobe" />
+      </div>
+    )
+  }
+}
+```
+
+* 增强context
+
+```js
+import React, { PureComponent, createContext } from "react"
+
+const UserContext = createContext({
+  duty: "SG",
+  country: "美国",
+})
+
+class Home extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        {this.props.name}
+        {this.props.country}
+      </div>
+    )
+  }
+}
+class About extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        {this.props.name}
+        {this.props.country}
+      </div>
+    )
+  }
+}
+
+//增强context
+function enhanceComponent(WapperdComponent) {
+  return (props) => {
+    return (
+      // 上下文对象需要传递的值放在高阶组件中，这样使用高阶组件包裹的组件就可以直接从props中拿到
+      <UserContext.Consumer>
+        {(value) => {
+          return <WapperdComponent {...props} {...value} />
+        }}
+      </UserContext.Consumer>
+    )
+  }
+}
+const EnhanceHome = enhanceComponent(Home)
+const EnhanceAbout = enhanceComponent(About)
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        <UserContext.Provider value={{ duty: "PG", country: "德国" }}>
+          <EnhanceHome name="haha" />
+          <EnhanceAbout name="kobe" />
+        </UserContext.Provider>
+      </div>
+    )
+  }
+}
+```
+
+##### 渲染判断鉴权
+
+比如说用户未登录，只能跳转到登录页面
+
+```js
+import React, { PureComponent } from "react"
+
+class Home extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return <div>home page</div>
+  }
+}
+class LoginPage extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return <div>login page</div>
+  }
+}
+
+//登录渲染鉴权
+function enhanceAuth(WapperdComponent) {
+  return (props) => {
+    if (!props.isLogin) {
+      return <LoginPage />
+    } else {
+      return <WapperdComponent {...props}/>
+    }
+  }
+}
+const EnhanceHome = enhanceAuth(Home)
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        <EnhanceHome isLogin={true} />
+        <EnhanceHome isLogin={false} />
+      </div>
+    )
+  }
+}
+```
+
+##### 生命周期劫持
+
+比如现在需要知道每个组件的初次渲染时间
+
+```js
+import React, { PureComponent } from "react"
+
+class Home extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return <div>home page</div>
+  }
+}
+
+//生命周期劫持
+function WithRenderTime(WapperdComponent) {
+  return class extends PureComponent {
+    constructor(props) {
+      super(props)
+      this.beginTime = Date.now()
+    }
+    componentDidMount() {
+      const interval = Date.now() - this.beginTime
+      console.log(`${WapperdComponent.name}组件的渲染时间是:${interval}`)
+    }
+    render() {
+      return <WapperdComponent />
+    }
+  }
+}
+const EnhanceHome = WithRenderTime(Home)
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+  }
+  render() {
+    return (
+      <div>
+        <EnhanceHome />
+      </div>
+    )
+  }
+}
+```
+
+#### 高阶组件意义
+
+![image-20220706152531424](index.assets/image-20220706152531424.png) 
+
+### Portals的使用
+
+![image-20220706160230110](index.assets/image-20220706160230110.png) 
 
 
 
+Modal模态框案例
 
+封装一个弹窗，但是现在要让弹窗都加载到根节点的兄弟元素`#modal`上面
+
+![image-20220706162300886](index.assets/image-20220706162300886.png) 
+
+![image-20220706162330050](index.assets/image-20220706162330050.png) 效果
+
+...
 
 
 
