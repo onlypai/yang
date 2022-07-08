@@ -1844,10 +1844,7 @@ export default class App extends PureComponent {
     console.log(this.ChildRef.current)
   }
 }
-
 ```
-
-
 
 #### 受控组件、非受控组件
 
@@ -2268,7 +2265,13 @@ export default class App extends PureComponent {
 
 ![image-20220706152531424](index.assets/image-20220706152531424.png) 
 
-### Portals的使用
+### 组件补充
+
+#### refs转发
+
+见`ref`
+
+#### Portals的使用
 
 ![image-20220706160230110](index.assets/image-20220706160230110.png) 
 
@@ -2284,25 +2287,194 @@ Modal模态框案例
 
 ...
 
+#### Fragment组件
+
+此组件的作用相当于vue中的`template`，小程序中的`block`
+
+你可以使用此组件代替jsx最外层包裹的元素，不会渲染在页面
+
+```js
+import React, { Fragment, PureComponent } from "react"
+
+export default class App extends PureComponent {
+  render() {
+    return (
+      // <Fragment>
+      //   <h4>标题</h4>
+      //   <div>内容</div>
+      // </Fragment>
+
+      // 短语法,只写个标签也是代表使用了Fragment
+      // 但是，短语法中不能添加任何属性⭐，如果你渲染一个列表要使用key属性，就需要写全Fragment
+      <>
+        <h4>标题</h4>
+        <div>内容</div>
+      </>
+    )
+  }
+}
+```
+
+#### StrictMode组件
+
+![image-20220707105012315](index.assets/image-20220707105012315.png) 
+
+```js
+const root = ReactDOM.createRoot(document.getElementById("root"))
+// root.render(<App />)
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+```
+
+> 严格模式检查的是什么
+
+![image-20220707110213555](index.assets/image-20220707110213555.png) 
+
+```js
+import React, { Fragment, PureComponent, StrictMode } from "react"
+
+class Home extends PureComponent {
+  UNSAFE_componentWillMount() {
+    console.log("UNSAFE_componentWillMount 严格模式抛出警告")
+  }
+  render() {
+    return (
+      <>
+        <h4>哈哈</h4>
+      </>
+    )
+  }
+}
+export default class App extends PureComponent {
+  render() {
+    return (
+      <Fragment>
+        <h4>标题</h4>
+        <div>内容</div>
+        <StrictMode>
+          <Home />
+        </StrictMode>
+      </Fragment>
+    )
+  }
+}
+```
+
+![image-20220707110654693](index.assets/image-20220707110654693.png) 
+
+> 有些第三方库开发时可能没有使用严格模式，所以报错都是有可能的
+
+## React中的样式
+
+### React中的css
+
+![image-20220707111739165](index.assets/image-20220707111739165.png) 
+
+### 几种书写css的方式
+
+#### 内联样式
+
+![image-20220707112507554](index.assets/image-20220707112507554.png) 
+
+```js
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      color: "green",
+    }
+  }
+  render() {
+    const pStyle = {
+      fontSize: "60px",
+      background: this.state.color,
+    }
+    return (
+      <div>
+        <h2 style={{ fontSize: "50px", color: "red" }}>标题</h2>
+        <p style={pStyle}>文字藐视大赛u发表iub</p>
+      </div>
+    )
+  }
+}
+```
+
+#### 普通css
+
+每个组件引入自己的css样式文件
+
+![image-20220708103048615](index.assets/image-20220708103048615.png) 
+
+![image-20220708105458800](index.assets/image-20220708105458800.png) 
+
+> 弊端
+>
+> * 不同文件中相同类名的样式会有覆盖
+> * 如果精确到`子代选择器`确实可以避免覆盖，但是这样做过于复杂
+> * 如果你使用`less、scss`等css预处理器来方便书写，但是这些样式在打包后依然变成普通的css样式，所有还是有覆盖问题
+
+#### css modules(css模块)
+
+css modules并不是react特有的方案，而是所有使用了类似于webpack配置的环境下都可以使用
+
+但是在其他项目中使用需要自己配置，比如配置`webpack.config.js`中`css-loader`相关的`modules:true`
+
+react脚手架内置了css modules的配置
+
+**将.css/.less/.scss样式文件改成`.module.css/.module.less/.module.scss`**即可直接引入并`当作模块`使用
+
+![image-20220708140724375](index.assets/image-20220708140724375.png) 
+
+ ![image-20220708142825494](index.assets/image-20220708142825494.png) 渲染出来的类名会加上唯一字符
+
+> 解决了局部作用域的问题，但是也有一定的缺陷
+>
+> ![image-20220708143822378](index.assets/image-20220708143822378.png) 
+
+#### css in js（styled-componentd库）
+
+ CSS 由 JavaScript 生成而不是在外部文件中定义
+
+*注意此功能并不是 React 的一部分，而是由第三方库提供。* React 对样式如何定义并没有明确态度
+
+认识`styled-componentd`
+
+![image-20220708144551479](index.assets/image-20220708144551479.png) 
+
+> 分号不可省略
+
+包含css常用预处理器功能：`样式嵌套、伪类选择器、伪元素选择器、动态修改属性`等
+
+styled.button``
+
+styled.input``
+
+styled.main``   调用什么元素所对应的函数返回的组件就渲染成什么元素对象
+
+![image-20220708152421647](index.assets/image-20220708152421647.png) 
 
 
 
+**动态修改属性⭐**：
+
+![image-20220708155021798](index.assets/image-20220708155021798.png) 
 
 
 
+高级特性：`继承`、`主题`
+
+有一些样式可能是相同的，可以使用继承
+
+![image-20220708161136477](index.assets/image-20220708161136477.png) 
 
 
 
-
-
-
-
-
-
-
-
-
-
+> 该库搭配vscode插件`vscode-styled-components`使用（语法提示）
+>
+> ![image-20220708150927839](index.assets/image-20220708150927839.png) 
 
 
 
@@ -2349,4 +2521,33 @@ Modal模态框案例
 <Child {...this.state} />
 <Child {...this.props} />
 ```
+
+#### ES6模板字符串
+
+```js
+    //标签模板字符串:可以通过模板字符串的方式对一个函数进行调用、
+    const name = "kobe"
+    const age = 18
+    function aaa(...args) {
+      console.log(args)
+    }
+    aaa``
+    aaa`my name is ${name},age is ${age}` //调用函数并传参
+    
+    //console
+    [Array(1)]
+    0: ['', raw: Array(1)]
+    length: 1
+    [[Prototype]]: Array(0)
+    VM1397:236 
+
+    (3) [Array(3), 'kobe', 18]
+    0: (3) ['my name is ', ',age is ', '', raw: Array(3)]
+    1: "kobe"
+    2: 18
+    length: 3
+    [[Prototype]]: Array(0)
+```
+
+![image-20220708150019199](index.assets/image-20220708150019199.png) 
 
