@@ -2476,7 +2476,79 @@ styled.main``   调用什么元素所对应的函数返回的组件就渲染成�
 >
 > ![image-20220708150927839](index.assets/image-20220708150927839.png) 
 
+### react动态添加class
 
+vue中添加class是比较容易地事情
+
+ ![image-20220717211911606](index.assets/image-20220717211911606.png) 
+
+原生react中添加class是比较繁琐的 ，我们可以借助一个第三方库`classnames`
+
+```shell
+npm i classnames
+```
+
+```js
+import React, { PureComponent } from 'react'
+
+//classNames是一个函数，返回一个字符串，作为className属性的值
+import classNames from 'classnames'
+
+export default class App extends PureComponent {
+  constructor(props) {
+    super(props)
+    this.state = {
+      isActive: true,
+      isBar: true,
+    }
+  }
+  render() {
+    const isActive = this.state.isActive
+    const isBar = this.state.isBar
+
+    const aclass = classNames('asd', 'dsadasd')
+    console.log(aclass)
+
+    const classHaha = 'hahaha'
+    return (
+      <div>
+        {/* 原生react添加class */}
+        <div className={'aaa bbb sasa'}>我是标题</div>
+        <div className={'aaa' + (isActive ? ' active' : '')}>我是标题</div>
+        <div className={['aaa', isActive ? 'active' : ''].join(' ')}>我是标题</div>
+
+        {/* classNames添加class */}
+        <div className={aclass}>我是标题</div>
+        <div className={classNames({ active: isActive, bar: isBar })}>传入对象</div>
+        <div className={classNames({ active: isActive, bar: isBar }, 'aaa')}>传入对象＋字符</div>
+        <div className={classNames({ active: isActive }, 'aaa', classHaha)}>
+          传入对象＋字符＋属性
+        </div>
+        <div className={classNames(10, 0, undefined, 'aaa')}>
+          传入的值转化成布尔值为true就可以渲染 渲染class="10 aaa"
+        </div>
+        <div className={classNames(['asa', 'sss'], 'aaa')}>传入数组</div>
+        <div className={classNames(['asa', { active: isActive }], 'aaa')}>传入数组，数组中对象</div>
+      </div>
+    )
+  }
+}
+```
+
+### antdesign
+
+`antd` 是基于 Ant Design 设计体系的 React UI 组件库，主要用于研发企业级中后台产品。
+
+✨ 特性[#](https://ant.design/docs/react/introduce-cn#✨-特性)
+
+- 🌈 提炼自企业级中后台产品的交互语言和视觉风格。
+- 📦 开箱即用的高质量 React 组件。
+- 🛡 使用 TypeScript 开发，提供完整的类型定义文件。
+- ⚙️ `全链路`开发和设计工具体系。
+- 🌍 数十个国际化语言支持。
+- 🎨 深入每个细节的主题定制能力。
+
+![image-20220717220121620](index.assets/image-20220717220121620.png) 
 
 
 
