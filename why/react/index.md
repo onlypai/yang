@@ -2434,7 +2434,7 @@ react脚手架内置了css modules的配置
 >
 > ![image-20220708143822378](index.assets/image-20220708143822378.png) 
 
-#### css in js（styled-componentd库）
+#### css in js（styled-components库）
 
  CSS 由 JavaScript 生成而不是在外部文件中定义
 
@@ -2535,7 +2535,7 @@ export default class App extends PureComponent {
 }
 ```
 
-### antdesign
+### `antdesign`
 
 `antd` 是基于 Ant Design 设计体系的 React UI 组件库，主要用于研发企业级中后台产品。
 
@@ -2548,7 +2548,117 @@ export default class App extends PureComponent {
 - 🌍 数十个国际化语言支持。
 - 🎨 深入每个细节的主题定制能力。
 
-![image-20220717220121620](index.assets/image-20220717220121620.png) 
+![image-20220717220121620](index.assets/image-20220717220121620.png)
+
+使用
+
+```js
+import React from 'react';
+import { Button } from 'antd';
+import './App.css';
+
+const App = () => (
+  <div className="App">
+    <Button type="primary">Button</Button>
+  </div>
+);
+
+export default App;
+```
+
+ 修改 `src/App.css`，在文件顶部引入 `antd/dist/antd.css`。
+
+```css
+@import '~antd/dist/antd.css';
+```
+
+> AntD时都会将一些没有用的代码（组件或逻辑代码）引入，造成包很大呢
+>
+> ###### 按需加载[#](https://ant.design/docs/react/introduce-cn#按需加载)（官方文档）
+>
+> `antd` 的 JS 代码默认支持基于 ES modules 的` tree shaking`。
+>
+> tree shaking概念就是`一棵树在抖动过程中，需要的留下，不需要的甩开`，没有用上的模块不会被打包，比如说import { Button } from ‘antd’ 就只会打包button组件的部分，并且button组件部分也不会全部打包，用到的部分才会被打包
+
+### [`craco`](https://ant.design/docs/react/use-with-create-react-app-cn#%E9%AB%98%E7%BA%A7%E9%85%8D%E7%BD%AE)
+
+ [craco](https://github.com/gsoft-inc/craco) （一个对 create-react-app 进行自定义配置的社区解决方案）。
+
+![image-20220723095817459](index.assets/image-20220723095817459.png) 
+
+现在我们安装 craco 并修改 `package.json` 里的 `scripts` 属性。
+
+```js
+$ yarn add @craco/craco
+
+/* package.json */
+//react-scripts替换成craco
+"scripts": {
+-   "start": "react-scripts start",
+-   "build": "react-scripts build",
+-   "test": "react-scripts test",
+
++   "start": "craco start",
++   "build": "craco build",
++   "test": "craco test",
+}
+```
+
+然后在项目根目录创建一个 `craco.config.js` 用于修改默认配置。
+
+```js
+/* craco.config.js */
+module.exports = {
+  // ...
+};
+```
+
+`自定义主题`[#](https://ant.design/docs/react/use-with-create-react-app-cn#自定义主题)
+
+按照 [配置主题](https://ant.design/docs/react/customize-theme-cn) 的要求，自定义主题需要用到类似 [less-loader](https://github.com/webpack-contrib/less-loader/) 提供的 less 变量覆盖功能。我们可以引入 [craco-less](https://github.com/DocSpring/craco-less) 来帮助加载 less 样式和修改变量。
+
+首先把 `src/App.css` 文件修改为 `src/App.less`，然后修改样式引用为 less 文件。
+
+```less
+/* src/App.js */
+- import './App.css';
++ import './App.less';
+
+/* src/App.less */
+- @import '~antd/dist/antd.css';
++ @import '~antd/dist/antd.less';
+```
+
+然后安装 `craco-less` 并修改 `craco.config.js` 文件如下。
+
+```js
+$ yarn add craco-less
+
+
+const CracoLessPlugin = require('craco-less');
+
+module.exports = {
+  plugins: [
+    {
+      plugin: CracoLessPlugin,
+      options: {
+        lessLoaderOptions: {
+          lessOptions: {
+            modifyVars: { '@primary-color': '#1DA57A' },
+            javascriptEnabled: true,
+          },
+        },
+      },
+    },
+  ],
+};
+```
+
+这里利用了 [less-loader](https://github.com/webpack/less-loader#less-options) 的 `modifyVars` 来进行主题配置，变量和其他配置方式可以参考 [配置主题](https://ant.design/docs/react/customize-theme-cn) 文档。修改后重启 `yarn start`，如果看到一个绿色的按钮就说明配置成功了。
+
+antd 内建了深色主题和紧凑主题，你可以参照 [使用暗色主题和紧凑主题](https://ant.design/docs/react/customize-theme-cn#使用暗色主题和紧凑主题) 进行接入。
+
+> 同样，你可以使用 [react-app-rewired](https://github.com/timarney/react-app-rewired) 和 [customize-cra](https://github.com/arackaf/customize-cra) 来自定义 create-react-app 的 webpack 配置。
 
 
 
@@ -2562,17 +2672,9 @@ export default class App extends PureComponent {
 
 
 
+## 语法补充
 
-
-
-
-
-
-
-
-### 语法补充
-
-#### 编码规范
+### 编码规范
 
 建议在state中只保存会改变的数据，那些`不会改变的数据可以直接放在constructor函数里面`
 
@@ -2585,7 +2687,7 @@ export default class App extends PureComponent {
   }
 ```
 
-#### 属性展开
+### 属性展开
 
 传入给子组件的数据可以直接展开写，在子组件中的props对象中拿到
 
@@ -2594,7 +2696,7 @@ export default class App extends PureComponent {
 <Child {...this.props} />
 ```
 
-#### ES6模板字符串
+### ES6模板字符串
 
 ```js
     //标签模板字符串:可以通过模板字符串的方式对一个函数进行调用、
